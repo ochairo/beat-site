@@ -29,7 +29,11 @@ function renderHeadings(
               const el = document.getElementById(h.id);
               if (el) {
                 el.scrollIntoView({ behavior: "smooth", block: "start" });
-                history.replaceState(null, "", `/beat-site/docs/${slug}#${h.id}`);
+                history.replaceState(
+                  null,
+                  "",
+                  `/beat-site/docs/${slug}#${h.id}`,
+                );
               }
             }}
           >
