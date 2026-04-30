@@ -8,10 +8,10 @@ const TEMPLATES: readonly PlaygroundTemplate[] = [
     title: "Beat Basic",
   },
   {
-    key: "showcases",
-    label: "Showcases",
-    url: "https://stackblitz.com/github/ochairo/beat-create/tree/main/templates/showcases?embed=1&file=src/main.tsx&theme=dark",
-    title: "Beat Showcases",
+    key: "ui",
+    label: "UI",
+    url: "https://stackblitz.com/github/ochairo/beat-create/tree/main/templates/ui?embed=1&file=src/main.tsx&theme=dark",
+    title: "Beat UI",
   },
 ];
 
