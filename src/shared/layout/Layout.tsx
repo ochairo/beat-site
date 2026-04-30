@@ -1,0 +1,64 @@
+import { component, type BeatJsxChild } from "@ochairo/beat";
+import {
+  AppShell,
+  IconMoon,
+  IconSun,
+  Switch,
+  type AppShellSidebarMode,
+} from "@ochairo/beat-ui";
+
+import { themeController } from "../theme";
+import css from "./Layout.module.css";
+
+export interface SiteLayoutProps {
+  readonly children: BeatJsxChild;
+  readonly sidebar?: BeatJsxChild;
+  readonly sidebarMode?: AppShellSidebarMode;
+}
+
+const brand = "Beat";
+
+const headerRight = (
+  <div class={css["headerRight"]!}>
+    <a href="/beat/docs/motivation" class={css["navLink"]!}>
+      Docs
+    </a>
+    <a href="/beat/components" class={css["navLink"]!}>
+      Components
+    </a>
+    <a href="/beat/playground" class={css["navLink"]!}>
+      Playground
+    </a>
+    <a
+      href="https://github.com/ochairo/beat"
+      target="_blank"
+      rel="noopener noreferrer"
+      class={css["navLink"]!}
+    >
+      GitHub
+    </a>
+    <Switch
+      defaultChecked={themeController.mode.get() === "dark"}
+      onCheckedChange={(checked) =>
+        themeController.setMode(checked ? "dark" : "light")
+      }
+      checkedIcon={<IconMoon size={12} />}
+      uncheckedIcon={<IconSun size={12} />}
+      ariaLabel="Toggle theme"
+    />
+  </div>
+);
+
+export const SiteLayout = component<SiteLayoutProps>((props): BeatJsxChild => {
+  return (
+    <AppShell
+      brand={brand}
+      brandHref="/beat/"
+      headerRight={headerRight}
+      sidebar={props.sidebar}
+      sidebarMode={props.sidebarMode ?? "none"}
+    >
+      {props.children}
+    </AppShell>
+  );
+});

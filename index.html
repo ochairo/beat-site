@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beat — Pulse-native JSX Framework</title>
+    <meta
+      name="description"
+      content="Fine-grained rendering with explicit routing and async primitives. Direct-DOM, no virtual DOM."
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        overflow: hidden;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      ul,
+      ol {
+        list-style: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-size: inherit;
+        font-weight: inherit;
+      }
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font: inherit;
+        color: inherit;
+      }
+      pre,
+      code {
+        font-family: "SF Mono", "Fira Code", "JetBrains Mono", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/app/main.tsx"></script>
+  </body>
+</html>

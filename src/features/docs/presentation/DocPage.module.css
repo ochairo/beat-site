@@ -1,0 +1,5 @@
+.notFound {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--beat-ui-color-text-muted);
+}

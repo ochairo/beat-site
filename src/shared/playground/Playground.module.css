@@ -1,0 +1,22 @@
+.output {
+  width: 100%;
+  border: none;
+  display: block;
+  background: transparent;
+  color-scheme: inherit;
+}
+
+.error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--beat-ui-color-danger);
+  background: var(--beat-ui-color-background-elevated);
+  border-top: 1px solid var(--beat-ui-color-danger);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+  max-height: 120px;
+}
