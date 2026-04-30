@@ -22,14 +22,14 @@ function renderHeadings(
       {headings.map((h) => (
         <li>
           <a
-            href={`/beat/docs/${slug}#${h.id}`}
+            href={`/beat-site/docs/${slug}#${h.id}`}
             class={h.level === 3 ? css["subLinkDeep"]! : css["subLink"]!}
             onClick={(e: MouseEvent) => {
               e.preventDefault();
               const el = document.getElementById(h.id);
               if (el) {
                 el.scrollIntoView({ behavior: "smooth", block: "start" });
-                history.replaceState(null, "", `/beat/docs/${slug}#${h.id}`);
+                history.replaceState(null, "", `/beat-site/docs/${slug}#${h.id}`);
               }
             }}
           >
@@ -65,7 +65,7 @@ export const Sidebar = component<SidebarProps>((props): BeatJsxChild => {
           return (
             <div>
               <a
-                href={`/beat/docs/${singlePage.slug}`}
+                href={`/beat-site/docs/${singlePage.slug}`}
                 class={getSinglePageTitleClass(active, index === 0)}
                 onClick={(e: MouseEvent) => {
                   e.preventDefault();
@@ -96,7 +96,7 @@ export const Sidebar = component<SidebarProps>((props): BeatJsxChild => {
                 return (
                   <li>
                     <a
-                      href={`/beat/docs/${page.slug}`}
+                      href={`/beat-site/docs/${page.slug}`}
                       class={active ? css["navLinkActive"]! : css["navLink"]!}
                       onClick={(e: MouseEvent) => {
                         e.preventDefault();

@@ -50,7 +50,7 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
           </p>
           <div class={css["buttons"]!}>
             <a
-              href="/beat/docs/getting-started"
+              href="/beat-site/docs/getting-started"
               class={css["primaryButton"]!}
               onClick={(e: MouseEvent) => {
                 e.preventDefault();

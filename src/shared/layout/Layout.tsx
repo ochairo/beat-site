@@ -20,13 +20,13 @@ const brand = "Beat";
 
 const headerRight = (
   <div class={css["headerRight"]!}>
-    <a href="/beat/docs/motivation" class={css["navLink"]!}>
+    <a href="/beat-site/docs/motivation" class={css["navLink"]!}>
       Docs
     </a>
-    <a href="/beat/components" class={css["navLink"]!}>
+    <a href="/beat-site/components" class={css["navLink"]!}>
       Components
     </a>
-    <a href="/beat/playground" class={css["navLink"]!}>
+    <a href="/beat-site/playground" class={css["navLink"]!}>
       Playground
     </a>
     <a
@@ -53,7 +53,7 @@ export const SiteLayout = component<SiteLayoutProps>((props): BeatJsxChild => {
   return (
     <AppShell
       brand={brand}
-      brandHref="/beat/"
+      brandHref="/beat-site/"
       headerRight={headerRight}
       sidebar={props.sidebar}
       sidebarMode={props.sidebarMode ?? "none"}

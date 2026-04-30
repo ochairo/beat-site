@@ -57,5 +57,5 @@ const routes: readonly BeatRouteDefinition[] = [
 
 export const router = createRouter({
   routes,
-  basePath: "/beat",
+  basePath: "/beat-site",
 });
