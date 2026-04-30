@@ -50,11 +50,11 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
           </p>
           <div class={css["buttons"]!}>
             <a
-              href="/beat-site/docs/getting-started"
+              href="/beat-site/docs/quick-start"
               class={css["primaryButton"]!}
               onClick={(e: MouseEvent) => {
                 e.preventDefault();
-                props.match.navigate("/docs/getting-started");
+                props.match.navigate("/docs/quick-start");
               }}
             >
               Get Started
