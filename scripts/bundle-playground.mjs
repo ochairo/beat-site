@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { existsSync } from "fs";
+import { existsSync, copyFileSync } from "fs";
 import { createRequire } from "module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -91,4 +91,20 @@ for (const {
     ...(tsconfig ? { tsconfig } : {}),
   });
   console.log(`built ${outfile.replace(root + "/", "")}`);
+}
+
+// Copy beat-ui CSS
+const beatUiSiblingDir = resolve(root, "../beat-ui");
+let beatUiCssSrc;
+if (existsSync(beatUiSiblingDir)) {
+  beatUiCssSrc = resolve(beatUiSiblingDir, "dist/index.css");
+} else {
+  const pkgMain = require.resolve("@ochairo/beat-ui");
+  beatUiCssSrc = resolve(pkgMain, "../../dist/index.css");
+}
+if (existsSync(beatUiCssSrc)) {
+  copyFileSync(beatUiCssSrc, resolve(out, "beat-ui.css"));
+  console.log("built public/playground/beat-ui.css");
+} else {
+  console.warn("beat-ui CSS not found at", beatUiCssSrc);
 }
