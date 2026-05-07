@@ -1,10 +1,35 @@
 import { build } from "esbuild";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { existsSync } from "fs";
+import { createRequire } from "module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const out = resolve(root, "public/playground");
+const require = createRequire(import.meta.url);
+
+function siblingOrInstalled(pkg, srcRelPath, tsconfigRelPath) {
+  const siblingDir = resolve(root, `../${pkg}`);
+  if (existsSync(siblingDir)) {
+    return {
+      entryPoint: resolve(siblingDir, srcRelPath),
+      tsconfig: resolve(siblingDir, tsconfigRelPath),
+    };
+  }
+  // Fall back to installed package dist
+  const pkgMain = require.resolve(`@ochairo/${pkg}`);
+  // For sub-paths like jsx-runtime, render, dom — derive from package exports
+  const pkgDir = resolve(pkgMain, "../../");
+  const distFile = resolve(
+    pkgDir,
+    srcRelPath.replace(/^src\//, "dist/").replace(/\.ts$/, ".js"),
+  );
+  return {
+    entryPoint: existsSync(distFile) ? distFile : pkgMain,
+    tsconfig: undefined,
+  };
+}
 
 const beatExternals = [
   "@ochairo/beat",
@@ -15,54 +40,47 @@ const beatExternals = [
 
 const bundles = [
   {
-    entryPoints: [resolve(root, "../pulse/src/index.ts")],
+    ...siblingOrInstalled("pulse", "src/index.ts", "tsconfig.json"),
     outfile: `${out}/pulse.js`,
     external: [],
-    tsconfig: resolve(root, "../pulse/tsconfig.json"),
   },
   {
-    entryPoints: [resolve(root, "../beat/src/index.ts")],
+    ...siblingOrInstalled("beat", "src/index.ts", "tsconfig.json"),
     outfile: `${out}/beat.js`,
     external: ["@ochairo/pulse"],
-    tsconfig: resolve(root, "../beat/tsconfig.json"),
   },
   {
-    entryPoints: [resolve(root, "../beat/src/jsx-runtime.ts")],
+    ...siblingOrInstalled("beat", "src/jsx-runtime.ts", "tsconfig.json"),
     outfile: `${out}/beat-jsx-runtime.js`,
     external: ["@ochairo/beat", "@ochairo/pulse"],
-    tsconfig: resolve(root, "../beat/tsconfig.json"),
   },
   {
-    entryPoints: [resolve(root, "../beat/src/render.ts")],
+    ...siblingOrInstalled("beat", "src/render.ts", "tsconfig.json"),
     outfile: `${out}/beat-render.js`,
     external: ["@ochairo/beat", "@ochairo/pulse"],
-    tsconfig: resolve(root, "../beat/tsconfig.json"),
   },
   {
-    entryPoints: [resolve(root, "../beat/src/dom.ts")],
+    ...siblingOrInstalled("beat", "src/dom.ts", "tsconfig.json"),
     outfile: `${out}/beat-dom.js`,
     external: ["@ochairo/beat", "@ochairo/pulse"],
-    tsconfig: resolve(root, "../beat/tsconfig.json"),
   },
   {
-    entryPoints: [resolve(root, "../beat-ui/src/index.ts")],
+    ...siblingOrInstalled("beat-ui", "src/index.ts", "tsconfig.json"),
     outfile: `${out}/beat-ui.js`,
-    // @ochairo/scales is bundled in (Sparkline dependency)
     external: beatExternals,
-    tsconfig: resolve(root, "../beat-ui/tsconfig.json"),
     jsxImportSource: "@ochairo/beat",
   },
 ];
 
 for (const {
-  entryPoints,
+  entryPoint,
   outfile,
   external,
   tsconfig,
   jsxImportSource,
 } of bundles) {
   await build({
-    entryPoints,
+    entryPoints: [entryPoint],
     bundle: true,
     format: "esm",
     outfile,
@@ -70,7 +88,7 @@ for (const {
     minify: true,
     jsx: "automatic",
     ...(jsxImportSource ? { jsxImportSource } : {}),
-    tsconfig,
+    ...(tsconfig ? { tsconfig } : {}),
   });
   console.log(`built ${outfile.replace(root + "/", "")}`);
 }
