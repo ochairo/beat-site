@@ -2,9 +2,9 @@
 
 ## Where this started
 
-Have you ever stared at a `useEffect` dependency array and thought: *why am I telling the framework what my own code depends on?*
-
 Have you ever traced a re-render through five components, only to find that a single text node changed?
+
+Have you ever stared at a `useEffect` dependency array and thought: *why am I telling the framework what my own code depends on?*
 
 Have you ever added `useCallback`, `useMemo`, and a `key` prop to a single component — and felt like you were fighting the framework rather than building with it?
 
@@ -14,25 +14,37 @@ Beat is my answer to that question — here's the thinking behind it.
 
 ## How frameworks handle updates
 
-Most frameworks share a core assumption: **the framework decides when your code runs.**
+Most frameworks share a core assumption: **the framework decides the granularity of updates.**
 
 In React, a state change re-executes your entire component function — every variable, every expression, every child. A virtual DOM diff then figures out what actually changed.
 
 ```tsx
-function Dashboard() {
-  const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState("dark");
+import { useState, useEffect, memo } from "react";
 
-  // Changing the theme re-runs this entire function.
-  // user, setUser, theme, setTheme — all re-created.
-  // Every child component re-evaluates.
-  // The virtual DOM diffs everything to find that
-  // one CSS class changed.
+const MessagesPanelMemo = memo(MessagesPanel);
+
+function Dashboard({ socket }: { socket: WebSocket }) {
+  const [notifications, setNotifications] = useState(0);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    socket.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === "notification") setNotifications((n) => n + 1);
+      if (data.type === "message") setMessages((m) => [...m, data.message]);
+    };
+    return () => { socket.onmessage = null; };
+  }, [socket]);
+
+  // `memo` prevents MessagesPanel from re-evaluating when `messages` didn't change.
+  // But when `messages` updates, MessagesPanel's entire function body still re-runs.
+  // A new notification arrives — `notifications` updates — Dashboard re-runs from the top.
+  // Without memo, MessagesPanel would re-evaluate on every notification too.
 
   return (
-    <div className={theme}>
-      <Profile user={user} />
-      <Settings onThemeChange={setTheme} />
+    <div>
+      <NotificationBadge count={notifications} />
+      <MessagesPanelMemo messages={messages} />
     </div>
   );
 }
@@ -49,24 +61,38 @@ Beat uses a compiler too — its Vite plugin rewrites JSX so that `{count}` in a
 In Beat, **your component runs once.** It creates DOM elements, wires up subscriptions, and exits. When state changes, only the specific DOM nodes that depend on it update. Nothing else runs.
 
 ```tsx
-function Dashboard() {
-  const user = pulse<User | null>(null);
-  const theme = pulse("dark");
+import { onCleanup } from "@ochairo/beat";
+import { pulse } from "@ochairo/pulse";
+
+function Dashboard({ socket }: { socket: WebSocket }) {
+  const notifications = pulse(0);
+  const messages = pulse<Message[]>([]);
+
+  socket.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.type === "notification") notifications.set((n) => n + 1);
+    if (data.type === "message") messages.set((m) => [...m, data.message]);
+  };
+
+  onCleanup(() => { socket.onmessage = null; });
 
   // This function runs once. That's it.
-  // Changing `theme` updates one class name.
-  // `user` is untouched. No diff. No re-run.
+  // When `notifications` updates — only NotificationBadge's DOM node changes.
+  // When `messages` updates — only MessagesPanel's bound DOM nodes change.
+  // No component function ever re-runs. No diff. No memo needed.
 
   return (
-    <div class:dark={theme}>
-      <Profile user={user} />
-      <Settings onThemeChange={(t) => theme.set(t)} />
+    <div>
+      <NotificationBadge count={notifications} />
+      <MessagesPanel messages={messages} />
     </div>
   );
 }
 ```
 
-No stale closures — the function doesn't re-run. No dependency arrays — subscriptions are created once and stay. No memoization — nothing is re-computed unless you explicitly subscribed to it.
+No dependency arrays to maintain — subscriptions are created once and stay. No memoization needed — components don't re-run, so there's nothing to cache. Cleanup is explicit via `onCleanup`, not inferred from a dependency array.
+
+In the same scenario: no `React.memo` to add — isolation is the default, not something you opt into.
 
 Solid does this too, and does it well. Where Beat differs is in **what "explicit" means.**
 
@@ -148,7 +174,7 @@ If that sounds like your kind of thing, welcome. Feel free to ask questions or s
 
 | | React | Vue | Angular | Solid | Beat |
 | - | - | - | - | - | - |
-| Components | Re-execute on state change | Setup once, render re-runs | Re-execute on state change | Run once | Run once |
+| Components | Re-execute on state change | Setup once, render re-runs | Change detection (Zone.js or signals) | Run once | Run once |
 | DOM updates | Virtual DOM diff | Virtual DOM diff | Compiled DOM instructions | Direct binding | Direct binding |
 | Reactivity | Manual dependency arrays | Automatic via proxies | Automatic via signals | Automatic via signals | Explicit path subscriptions |
 | Subscription scope | Component-level | Property-level | Signal-level | Computation-level | Path-level |
