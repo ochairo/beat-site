@@ -10,9 +10,9 @@ Have you ever added `useCallback`, `useMemo`, and a `key` prop to a single compo
 
 I have. That frustration eventually turned into a question: **does it have to be this way?**
 
-Beat is my attempt at an answer. I'm not sure it's the best one, but it's the one that made the most sense to me.
+Beat is my answer to that question — here's the thinking behind it.
 
-## The re-render model
+## How frameworks handle updates
 
 Most frameworks share a core assumption: **the framework decides when your code runs.**
 
@@ -40,7 +40,7 @@ function Dashboard() {
 
 React has good tools to manage this: `React.memo`, `useMemo`, `useCallback`, and now the React Compiler. They work well. But they exist because the model creates the problem they solve.
 
-Other frameworks took different paths. Vue and MobX track property access automatically via proxies. Solid.js runs components once and tracks signal reads. Svelte compiles reactivity into the output. Angular moved from Zone.js to signals. Each one is a thoughtful take on the same problem, and they're all worth knowing.
+Other frameworks took different paths. Vue tracks property access automatically via proxies. Solid.js runs components once and tracks signal reads. Svelte compiles reactivity into the output. Angular moved from Zone.js to signals. Each one is a thoughtful take on the same problem, and they're all worth knowing.
 
 Beat uses a compiler too — its Vite plugin rewrites JSX so that `{count}` in a template automatically wires a subscription, similar to how Svelte works. Outside of templates, though, reactivity is always manual: `.get()` to read, `.on()` to subscribe, nothing inferred at runtime.
 
@@ -72,7 +72,7 @@ Solid does this too, and does it well. Where Beat differs is in **what "explicit
 
 ## Explicit subscriptions
 
-In auto-tracking systems (Solid, Vue, MobX, Angular signals), the framework builds a dependency graph by watching what you read during execution. You write natural code, and reactivity follows. It's a genuinely good approach — the ergonomics are hard to beat.
+In auto-tracking systems (Solid, Vue, Angular signals), the framework builds a dependency graph by watching what you read during execution. You write natural code, and reactivity follows. It's a genuinely good approach, and the ergonomics show.
 
 Beat takes a more manual path. Reactivity is never inferred at runtime:
 
@@ -101,7 +101,7 @@ In JSX templates, Beat's Vite plugin handles the common cases automatically. But
 
 ## Path-level state
 
-Most reactive systems track at the **property level** (MobX, Vue) or the **signal level** (Solid, Angular). Pulse tracks at the **path level**.
+Most reactive systems track at the **property level** (Vue) or the **signal level** (Solid, Angular). Pulse tracks at the **path level**.
 
 ```ts
 const state = pulse({ user: { name: "Ada", age: 30 }, theme: "dark" });
@@ -142,16 +142,16 @@ Auto-tracking frameworks like Solid, Vue, and Angular signals offer better ergon
 
 Beat is a good fit if you enjoy knowing exactly what your code is doing — if you'd rather write an explicit subscription than wonder why something re-ran. It's a narrower trade-off, made deliberately.
 
-If that sounds like your kind of thing, welcome.
+If that sounds like your kind of thing, welcome. Feel free to ask questions or share ideas in the [GitHub Discussions](https://github.com/ochairo/beat/discussions).
 
 ## At a glance
 
 | | React | Vue | Angular | Solid | Beat |
 | - | - | - | - | - | - |
-| Components | Re-execute on state change | Setup runs once, render re-executes | Re-execute on state change | Run once | Run once |
+| Components | Re-execute on state change | Setup once, render re-runs | Re-execute on state change | Run once | Run once |
 | DOM updates | Virtual DOM diff | Virtual DOM diff | Compiled DOM instructions | Direct binding | Direct binding |
 | Reactivity | Manual dependency arrays | Automatic via proxies | Automatic via signals | Automatic via signals | Explicit path subscriptions |
 | Subscription scope | Component-level | Property-level | Signal-level | Computation-level | Path-level |
-| Dependency management | Arrays and memoization | Automatic | Automatic | Automatic | None |
+| Dependency management | Arrays and memoization | Automatic | Automatic | Automatic | Explicit `.on()` calls |
 | SSR | Yes | Yes | Yes | Yes | Yes |
 | State primitive | `useState` / `useReducer` | `ref` / `reactive` | `signal` / `computed` | `createSignal` / `createStore` | `pulse` / `derived` |

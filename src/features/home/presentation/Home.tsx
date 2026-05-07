@@ -117,6 +117,15 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
             </a>
             <span class={css["footerDot"]!}>·</span>
             <a
+              href="https://github.com/ochairo/beat/discussions"
+              target="_blank"
+              rel="noopener noreferrer"
+              class={css["footerLink"]!}
+            >
+              Discussions
+            </a>
+            <span class={css["footerDot"]!}>·</span>
+            <a
               href="https://github.com/ochairo/beat/issues"
               target="_blank"
               rel="noopener noreferrer"
