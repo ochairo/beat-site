@@ -154,3 +154,92 @@ Reserved names can still be reached through `prop(key)`.
 ## `isPulse(value)`
 
 Checks whether a value is an authentic pulse instance.
+
+```ts
+function isPulse(value: unknown): value is Pulse<unknown>
+```
+
+Use this to distinguish real pulse nodes from plain objects that happen to have `get()` and `on()` methods.
+
+```ts
+import { isPulse, pulse } from "@ochairo/pulse";
+
+isPulse(pulse(0));  // true
+isPulse(0);         // false
+isPulse({ get() {}, on() {} }); // false
+```
+
+## `derived(source, fn)`
+
+Creates a read-only computed value that updates whenever `source` changes.
+
+```ts
+function derived<T, U>(source: Pulse<T>, fn: (value: T) => U): ReadonlyPulse<U>
+```
+
+`derived` skips notification when the computed result is unchanged (`Object.is` equality).
+
+```ts
+import { pulse, derived } from "@ochairo/pulse";
+
+const count = pulse(0);
+const doubled = derived(count, (v) => v * 2);
+
+doubled.get(); // 0
+count.set(3);
+doubled.get(); // 6
+```
+
+`ReadonlyPulse<T>` exposes `get()`, `on()`, and `destroy()`.
+Call `destroy()` to stop the derived node from tracking its source and release its subscription.
+
+## Exported Types
+
+### `Pulse<T>`
+
+The main pulse node type. Exposes `get()`, `set()`, `on()`, `prop()`, and (on the root) `batch()`.
+
+### `ReadonlyPulse<T>`
+
+A read-only computed node. Exposes `get()`, `on()`, and `destroy()`. Returned by `derived()`.
+
+### `PulseChangeEvent<T>`
+
+Passed to every `on()` listener.
+
+```ts
+interface PulseChangeEvent<T> {
+  currentValue: T;
+  previousValue: T;
+  changes: readonly PulseMutation[];
+}
+```
+
+### `PulseMutation`
+
+Union of `PulseMutationSet` and `PulseMutationDelete`. Describes a single path-level change inside an event.
+
+```ts
+interface PulseMutationSet {
+  kind: "set" | "replace";
+  path: PulsePath;
+  key: PropertyKey | undefined;
+  value: unknown;
+  previousValue: unknown;
+}
+
+interface PulseMutationDelete {
+  kind: "delete";
+  path: PulsePath;
+  key: PropertyKey | undefined;
+  previousValue: unknown;
+}
+```
+
+### `PulsePath`
+
+```ts
+type PulsePath = readonly PropertyKey[];
+```
+
+The absolute key path from the root to the mutated node.

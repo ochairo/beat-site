@@ -32,6 +32,14 @@ interface PlaygroundModules {
 }
 
 let modulesPromise: Promise<PlaygroundModules> | undefined;
+let beatUiCssPromise: Promise<string> | undefined;
+
+function loadBeatUiCss(): Promise<string> {
+  if (beatUiCssPromise) return beatUiCssPromise;
+  const url = import.meta.env.BASE_URL + "playground/beat-ui.css";
+  beatUiCssPromise = fetch(url).then((r) => r.text());
+  return beatUiCssPromise;
+}
 
 function loadModules(): Promise<PlaygroundModules> {
   if (modulesPromise) return modulesPromise;
@@ -74,6 +82,7 @@ function buildSrcdoc(
   compiledJs: string,
   height: string,
   modules: PlaygroundModules,
+  beatUiCss: string,
 ): string {
   const themeCss = getThemeCss();
 
@@ -87,9 +96,11 @@ function buildSrcdoc(
     `<meta charset="utf-8">`,
     `<style>`,
     themeCss,
+    beatUiCss,
     `*{margin:0;padding:0;box-sizing:border-box}`,
     `body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;`,
     `background:transparent;padding:0.75rem;min-height:${height};`,
+    `color:var(--beat-ui-color-text-muted);`,
     `display:flex;flex-wrap:wrap;align-items:flex-start;gap:0.75rem}`,
     `</style>`,
     `</head>`,
@@ -123,7 +134,11 @@ export const Playground = component<PlaygroundProps>((props): BeatJsxChild => {
   const updateOutput = async (code: string): Promise<void> => {
     errorText.set("");
 
-    const [result, modules] = await Promise.all([compile(code), loadModules()]);
+    const [result, modules, beatUiCss] = await Promise.all([
+      compile(code),
+      loadModules(),
+      loadBeatUiCss(),
+    ]);
 
     if (!result.ok) {
       errorText.set(result.error);
@@ -132,7 +147,7 @@ export const Playground = component<PlaygroundProps>((props): BeatJsxChild => {
 
     const iframe = iframeRef.current;
     if (iframe) {
-      iframe.srcdoc = buildSrcdoc(result.code, height, modules);
+      iframe.srcdoc = buildSrcdoc(result.code, height, modules, beatUiCss);
     }
   };
 

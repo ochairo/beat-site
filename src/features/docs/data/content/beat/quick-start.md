@@ -8,8 +8,6 @@ This guide walks through a small Beat application using:
 - route prefetch
 - explicit async resources
 
-This guide reflects the recommended Beat `1.1.x` usage model.
-
 ## 1. Scaffold A New App
 
 Fastest path:
@@ -24,7 +22,7 @@ For the showcases starter:
 pnpm dlx @ochairo/beat-create my-app --template showcases
 ```
 
-If you want to wire Beat into an existing app manually, use [Existing App Setup](./EXISTING_APP.md).
+If you want to wire Beat into an existing app manually, use [Existing App Setup](./integration.md).
 
 ## 2. Configure TypeScript
 
@@ -39,6 +37,8 @@ Set Beat as the JSX import source.
 }
 ```
 
+See [Compiler Contract](./compiler.md) for the full lowering contract.
+
 ## 3. Configure Vite
 
 ```ts
@@ -49,6 +49,8 @@ export default defineConfig({
   plugins: [createBeatVitePlugin()],
 });
 ```
+
+See [Compiler Contract](./compiler.md) for plugin options and lowering rules.
 
 ## 4. Create A Small App
 
@@ -64,6 +66,7 @@ import {
   createRoot,
   createRouter,
   onCleanup,
+  onMount,
 } from "@ochairo/beat";
 
 const counter = pulse(0);
@@ -168,9 +171,27 @@ A few Beat-specific details matter:
 - `router.reload()` reruns the current route loaders
 - `router.prefetch(to)` warms route data without changing history or current route state
 
-## 7. Next Steps
+## 7. Server-Side Rendering
+
+Beat's SSR uses the same component tree and router — no separate framework. Two entry points:
+
+- `entry-server.ts` — installs a DOM environment, creates the router with `initialUrl`, awaits loaders, calls `renderToString`
+- `entry-client.ts` — replaces `createRoot` with `hydrate` for an atomic server-HTML → live-tree swap
+
+```ts
+// entry-client.ts
+import { createRouter, hydrate } from "@ochairo/beat";
+
+const router = createRouter({ routes, window });
+hydrate(document.getElementById("app")!, <App router={router} />);
+```
+
+See [API — Server-Side Rendering](./api.md#server-side-rendering) for the full `entry-server.ts` pattern, `renderToString`, and `waitForRouter`.
+
+## 8. Next Steps
 
 After this guide, the most useful references are:
 
 - [API](./API.md)
 - [Compiler Contract](./COMPILER.md)
+- [Existing App Setup](./INTEGRATION.md)

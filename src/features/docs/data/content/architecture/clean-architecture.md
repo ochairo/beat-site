@@ -211,3 +211,5 @@ Components never instantiate repositories or fetch data themselves. This makes t
 - Respect the dependency rules: features are isolated, shared is generic, app orchestrates
 
 None of this is mandatory. Use what helps, skip what doesn't.
+
+For the recommended architecture when building domain-specific libraries rather than applications, see [Plugin Architecture](./plugin-architecture.md).

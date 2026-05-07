@@ -3,14 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "validate": "tsc --noEmit && vite build",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "bundle:playground": "node scripts/bundle-playground.mjs"
   },
   "dependencies": {
-    "@ochairo/beat": "^1.5.0",
-    "@ochairo/beat-ui": "^1.5.4",
+    "@ochairo/beat": "^1.6.0",
+    "@ochairo/beat-ui": "^1.6.0",
     "@ochairo/pulse": "^1.5.0",
     "esbuild-wasm": "^0.28.0",
     "highlight.js": "^11.11.1",
@@ -18,6 +20,7 @@
     "mermaid": "^11.14.0"
   },
   "devDependencies": {
+    "esbuild": "^0.25.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.2"
   },

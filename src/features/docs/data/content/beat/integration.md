@@ -23,6 +23,8 @@ export default defineConfig({
 });
 ```
 
+See [Compiler Contract](./compiler.md) for plugin options and lowering rules.
+
 ## 3. Configure TypeScript
 
 ```json
@@ -33,6 +35,8 @@ export default defineConfig({
   }
 }
 ```
+
+See [Compiler Contract](./compiler.md) for the full lowering contract.
 
 ## 4. Entry Point
 
@@ -60,8 +64,28 @@ const app = (
 createRoot(document.getElementById("app")!).render(app);
 ```
 
-## 5. Next Steps
+## 5. Server-Side Rendering
 
-- [Getting Started](./GETTING_STARTED.md)
+Add SSR with two entry points and no framework changes. Install a server-side DOM:
+
+```sh
+pnpm add -D happy-dom
+```
+
+Replace `createRoot` with `hydrate` in your client entry:
+
+```ts
+// entry-client.ts
+import { createRouter, hydrate } from "@ochairo/beat";
+
+const router = createRouter({ routes, window });
+hydrate(document.getElementById("app")!, <App router={router} />);
+```
+
+See [API — Server-Side Rendering](./api.md#server-side-rendering) for the full `entry-server.ts` pattern, `renderToString`, and `waitForRouter`.
+
+## 6. Next Steps
+
+- [Getting Started](./quick-start.md)
 - [API](./API.md)
 - [Compiler Contract](./COMPILER.md)

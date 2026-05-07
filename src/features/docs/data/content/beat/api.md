@@ -2,16 +2,9 @@
 
 This document describes the current public API of `@ochairo/beat`.
 
-This reference documents Beat's stable `1.1.x` contract for client-rendered SPA applications.
-For compiler behavior and environment/versioning policy, see `docs/COMPILER.md`.
-
 ## Stability
 
-Beat is currently in the `1.1.x` release line.
-
-That means:
-
-- the public API is stable within the documented client-rendered SPA scope
+- the public API is stable within the documented scope
 - breaking changes are reserved for future major versions
 - minor releases should add features without breaking existing contracts
 - patch releases should focus on fixes and non-breaking refinements
@@ -20,60 +13,11 @@ That means:
 
 Beat currently exposes these package entry points:
 
-- `@ochairo/beat`
-- `@ochairo/beat/jsx-runtime`
-- `@ochairo/beat/jsx-dev-runtime`
-- `@ochairo/beat/vite-plugin`
-
-Use the main package for runtime, DOM, router, and resource APIs.
-Use the JSX runtime subpaths through `jsxImportSource`.
-Use the Vite plugin subpath for Beat-specific JSX lowering.
-
-## Installation
-
-```sh
-pnpm add @ochairo/beat @ochairo/pulse
-```
-
-Beat currently expects:
-
-- Node `>=24 <25`
-- pnpm `>=10`
-
-## Minimal JSX Setup
-
-```json
-{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "@ochairo/beat"
-  }
-}
-```
-
-Basic Vite setup:
-
-```ts
-import { defineConfig } from "vite";
-import { createBeatVitePlugin } from "@ochairo/beat/vite-plugin";
-
-export default defineConfig({
-  plugins: [createBeatVitePlugin()],
-});
-```
-
-## Mental Model
-
-Beat is a Pulse-native framework.
-It does not use component rerender-by-default as its main update model.
-
-The intended model is:
-
-- keep state in `@ochairo/pulse`
-- rely on Pulse's exact-path semantics, where authentic Pulse nodes notify only the subscribed path unless you opt into broader behavior in Pulse itself
-- bind DOM directly to pulse values or pulse-backed objects
-- use JSX as authoring syntax, not as permission to rerender whole trees
-- use explicit router and resource state instead of hidden framework state machines
+- `@ochairo/beat` — runtime, DOM, router, and resource APIs
+- `@ochairo/beat/jsx-runtime` — consumed by TypeScript's JSX transform via `jsxImportSource`
+- `@ochairo/beat/jsx-dev-runtime` — dev-mode JSX transform
+- `@ochairo/beat/vite-plugin` — Beat-specific JSX lowering for Vite
+- `@ochairo/beat/server` — server-side rendering utilities (`renderToString`, `waitForRouter`)
 
 ## Core Runtime
 
@@ -109,6 +53,27 @@ render(target: Element, view: BeatJsxChild): BeatCleanup
 
 Use this when you want one-shot mounting without holding onto a root object.
 
+### `hydrate(target, view)`
+
+Attach a Beat view to a server-rendered element.
+
+```ts
+hydrate(target: Element, view: BeatJsxChild): BeatCleanup
+```
+
+Renders the view into detached nodes first, then performs a single atomic `replaceChildren` swap.
+The server HTML remains visible until the swap — no blank intermediate frame.
+
+Use `hydrate` in your client entry point when the HTML was produced by `renderToString` on the server.
+
+```ts
+// entry-client.ts
+import { createRouter, hydrate } from "@ochairo/beat";
+
+const router = createRouter({ routes, window });
+hydrate(document.getElementById("app")!, <App router={router} />);
+```
+
 ## JSX Runtime
 
 ### `jsx`, `jsxs`, `jsxDEV`, `Fragment`
@@ -138,6 +103,17 @@ onCleanup(cleanup: BeatCleanup): void
 
 This must run inside `component(...)`.
 It throws if used outside an active Beat component scope.
+
+### `onMount(callback)`
+
+Queue a callback to run after the current render is committed to the DOM.
+
+```ts
+onMount(callback: () => void): void
+```
+
+This must run inside `component(...)`.
+During server-side rendering (`renderToString`) `onMount` callbacks are suppressed — they are not queued and will not fire against the server DOM.
 
 ### `Show`
 
@@ -207,6 +183,13 @@ interface CreateBeatRouterOptions {
   readonly basePath?: string;
   readonly prefetchCacheMaxEntries?: number;
   readonly window?: Window;
+  /**
+   * Initial URL for server-side rendering.
+   * When provided, the router resolves the matching route from this URL
+   * instead of reading `window.location`.
+   * All navigation and history operations become no-ops.
+   */
+  readonly initialUrl?: string;
   readonly onError?: (event: BeatRouteErrorEvent) => void;
 }
 ```
@@ -332,6 +315,7 @@ Render the current route branch or named outlet branch.
 
 Beat exports these router-related types:
 
+- `BeatRouter`
 - `BeatRouteDefinition`
 - `BeatRouteMatch`
 - `BeatRouteBranchMatch`
@@ -495,21 +479,88 @@ Current responsibilities:
 
 The Vite plugin is intentionally a separate subpath export rather than part of the main runtime entry.
 
-## Current Limitations
+## Server-Side Rendering
 
-This API reference describes the current SPA-oriented Beat surface.
-These are not yet part of the completed platform story:
+Import from `@ochairo/beat/server`. Requires a DOM environment such as `happy-dom` to be installed on `globalThis.document` before calling.
 
-- SSR
-- hydration
-- a broader full-stack platform surface beyond the documented SPA runtime and compiler scope
+### `renderToString(factory)`
+
+```ts
+renderToString(factory: () => BeatJsxChild): string
+```
+
+Renders the view returned by `factory` to an HTML string.
+`onMount` callbacks are suppressed during rendering.
+
+The `factory` form ensures components run inside the SSR context — pass a function, not a pre-evaluated JSX expression:
+
+```ts
+// correct
+const html = renderToString(() => <App router={router} />);
+
+// incorrect — component runs before SSR context is entered
+const html = renderToString(<App router={router} />);
+```
+
+### `waitForRouter(router, options?)`
+
+```ts
+waitForRouter(
+  router: BeatRouter,
+  options?: { readonly signal?: AbortSignal },
+): Promise<void>
+```
+
+Waits for all `load` functions of the currently matched routes to settle.
+Resolves immediately when no loaders are active.
+
+Always pass an `AbortSignal` in server contexts so the promise rejects instead of hanging if a loader stalls or the router is disposed:
+
+```ts
+const router = createRouter({ routes, initialUrl: url });
+await waitForRouter(router, { signal: AbortSignal.timeout(5_000) });
+const html = renderToString(() => <App router={router} />);
+```
+
+### Full SSR Pattern
+
+```ts
+// entry-server.ts
+import { Window } from "happy-dom";
+import { createRouter } from "@ochairo/beat";
+import { renderToString, waitForRouter } from "@ochairo/beat/server";
+
+export async function render(url: string): Promise<string> {
+  const win = new Window({ url });
+  globalThis.document = win.document as unknown as Document;
+
+  const router = createRouter({ routes, initialUrl: url });
+  await waitForRouter(router, { signal: AbortSignal.timeout(5_000) });
+  const html = renderToString(() => <App router={router} />);
+
+  win.happyDOM.close();
+  return `<div id="app">${html}</div>`;
+}
+
+// entry-client.ts
+import { createRouter, hydrate } from "@ochairo/beat";
+
+const router = createRouter({ routes, window });
+hydrate(document.getElementById("app")!, <App router={router} />);
+```
 
 ## Recommended Starting Surface
 
 For most app code, start with:
 
 - `createRoot()` or `render()`
-- `component()` and `onCleanup()`
+- `component()`, `onCleanup()`, and `onMount()`
 - `Show` and `For`
 - `createRouter()`, `Link`, and `Outlet`
 - `createResource()`
+
+For server-rendered apps, add:
+
+- `hydrate()` on the client
+- `renderToString()` and `waitForRouter()` from `@ochairo/beat/server`
+- `initialUrl` on `createRouter()`
