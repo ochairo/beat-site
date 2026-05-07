@@ -1,10 +1,11 @@
-import { component, type BeatJsxChild } from "@ochairo/beat";
+import { component, onMount, type BeatJsxChild } from "@ochairo/beat";
 import { pulse } from "@ochairo/pulse";
 
-import { highlightCode } from "../../../shared/highlight";
-import { SiteLayout } from "../../../shared/layout";
-import { Playground } from "../../../shared/playground/Playground";
+import { highlightCode } from "../../../shared/lib/highlight/highlight";
+import { SiteLayout } from "../../../shared/layout/Layout";
+import { Playground } from "../../../shared/ui/playground/Playground";
 import type { ComponentShowcase, NavGroup } from "../domain";
+import { ComponentsSidebar } from "./ComponentsSidebar";
 import css from "./Components.module.css";
 
 export interface ComponentsPageProps {
@@ -16,30 +17,41 @@ const CATEGORIES = ["Actions", "Form", "Feedback", "Layout", "Data", "Icons"];
 
 export const ComponentsPage = component<ComponentsPageProps>(
   (props): BeatJsxChild => {
+    const activeId = pulse("");
+
+    // Map from nav item name to the first matching showcase id
+    const nameToId: Record<string, string> = {};
+    for (const showcase of props.showcases) {
+      if (!(showcase.name in nameToId)) {
+        nameToId[showcase.name] = showcase.id;
+      }
+    }
+
+    onMount(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              activeId.set(entry.target.id);
+              break;
+            }
+          }
+        },
+        { rootMargin: "-20% 0px -60% 0px", threshold: 0 },
+      );
+
+      const sections = document.querySelectorAll("section[id]");
+      sections.forEach((s) => observer.observe(s));
+
+      return () => observer.disconnect();
+    });
+
     const sidebar = (
-      <div class={css["sidebarContent"]!}>
-        {props.navGroups.map((group, index) => (
-          <div>
-            <div
-              class={index === 0 ? css["groupTitleFirst"]! : css["groupTitle"]!}
-            >
-              {group.label}
-            </div>
-            <ul class={css["navList"]!}>
-              {group.items.map((item) => (
-                <li>
-                  <a
-                    href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                    class={css["navLink"]!}
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      <ComponentsSidebar
+        navGroups={props.navGroups}
+        nameToId={nameToId}
+        activeId={activeId}
+      />
     );
 
     return (

@@ -65,10 +65,14 @@ const bundles = [
     external: ["@ochairo/beat", "@ochairo/pulse"],
   },
   {
-    ...siblingOrInstalled("beat-ui", "src/index.ts", "tsconfig.json"),
+    // Always use the pre-built dist so CSS Module class names are already resolved
+    entryPoint: (() => {
+      const siblingDist = resolve(root, "../beat-ui/dist/index.js");
+      if (existsSync(siblingDist)) return siblingDist;
+      return require.resolve("@ochairo/beat-ui");
+    })(),
     outfile: `${out}/beat-ui.js`,
     external: beatExternals,
-    jsxImportSource: "@ochairo/beat",
   },
 ];
 

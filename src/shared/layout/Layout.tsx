@@ -7,7 +7,7 @@ import {
   type AppShellSidebarMode,
 } from "@ochairo/beat-ui";
 
-import { themeController } from "../theme";
+import { themeController } from "../lib/theme/theme";
 import css from "./Layout.module.css";
 
 export interface SiteLayoutProps {

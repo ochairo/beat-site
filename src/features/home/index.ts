@@ -1,3 +1,4 @@
-export type { FeatureData, FeatureRepository } from "./domain";
-export { InMemoryFeatureRepository } from "./data";
-export { HomePage } from "./presentation";
+export type { FeatureData } from "./domain/types";
+export type { FeatureRepository } from "./domain/ports";
+export { InMemoryFeatureRepository } from "./data/feature-repository";
+export { HomePage } from "./presentation/Home";

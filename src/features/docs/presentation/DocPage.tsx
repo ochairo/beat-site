@@ -5,11 +5,11 @@ import {
 } from "@ochairo/beat";
 
 import type { DocSection } from "../domain";
-import { SiteLayout } from "../../../shared/layout";
-import { Sidebar } from "./Sidebar";
-import { replaceCodeBlocks } from "./code-blocks";
-import { renderMermaidBlocks } from "./mermaid";
-import { renderMarkdown } from "./markdown";
+import { SiteLayout } from "../../../shared/layout/Layout";
+import { Sidebar } from "./components/sidebar/Sidebar";
+import { replaceCodeBlocks } from "../infrastructure/code-blocks";
+import { renderMermaidBlocks } from "../infrastructure/mermaid";
+import { renderMarkdown } from "../infrastructure/markdown";
 import css from "./DocPage.module.css";
 
 export interface DocsPageProps {

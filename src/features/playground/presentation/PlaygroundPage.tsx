@@ -1,7 +1,7 @@
 import { component, type BeatJsxChild } from "@ochairo/beat";
 import { Tab, type TabItem } from "@ochairo/beat-ui";
 
-import { SiteLayout } from "../../../shared/layout";
+import { SiteLayout } from "../../../shared/layout/Layout";
 import type { PlaygroundTemplate } from "../domain";
 import css from "./PlaygroundPage.module.css";
 
@@ -26,11 +26,6 @@ export const PlaygroundPage = component<PlaygroundPageProps>(
     return (
       <SiteLayout>
         <section class={css["playground"]!}>
-          <h1 class={css["title"]!}>Playground</h1>
-          <p class={css["subtitle"]!}>
-            Try Beat in the browser. Edit, run, and experiment — no setup
-            required.
-          </p>
           <Tab items={tabItems} defaultValue="basic" />
         </section>
       </SiteLayout>

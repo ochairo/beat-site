@@ -3,5 +3,5 @@ export type {
   NavGroup,
   ComponentRepository,
 } from "./domain";
-export { InMemoryComponentRepository } from "./data";
+export { InMemoryComponentRepository } from "./data/component-repository";
 export { ComponentsPage } from "./presentation";

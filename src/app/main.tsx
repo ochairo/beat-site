@@ -3,7 +3,7 @@ import { ThemeRoot } from "@ochairo/beat-ui";
 import "@ochairo/beat-ui/style.css";
 
 import { router } from "./router";
-import { themeController } from "../shared/theme";
+import { themeController } from "../shared/lib/theme/theme";
 import css from "./main.module.css";
 
 themeController.applyTo(document.documentElement);

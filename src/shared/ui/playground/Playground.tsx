@@ -2,7 +2,7 @@ import { component, onMount, Show, type BeatJsxChild } from "@ochairo/beat";
 import { derived, pulse, type Pulse } from "@ochairo/pulse";
 import { CodeBlock } from "@ochairo/beat-ui";
 
-import { compile } from "./compiler";
+import { compile } from "../../lib/compiler/compiler";
 import css from "./Playground.module.css";
 
 export interface PlaygroundProps {

@@ -4,7 +4,7 @@ import {
   type BeatRouteMatch,
 } from "@ochairo/beat";
 
-import type { DocSection, DocHeading } from "../domain";
+import type { DocSection, DocHeading } from "../../../domain";
 import css from "./Sidebar.module.css";
 
 export interface SidebarProps {

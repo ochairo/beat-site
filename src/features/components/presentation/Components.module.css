@@ -1,48 +1,4 @@
-.sidebarContent {
-  padding: 1.5rem;
-}
-
-.groupTitle {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--beat-ui-color-text-muted);
-  margin: 1.5rem 0 0.4rem 0;
-  padding: 0;
-}
-
-.groupTitleFirst {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--beat-ui-color-text-muted);
-  margin: 0 0 0.4rem 0;
-  padding: 0;
-}
-
-.navList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.navLink {
-  display: block;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: var(--beat-ui-color-text-muted);
-  transition:
-    background 0.12s,
-    color 0.12s;
-}
-
 .inner {
-  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;

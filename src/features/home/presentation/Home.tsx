@@ -14,8 +14,8 @@ import {
 } from "@ochairo/beat-ui";
 import { pulse } from "@ochairo/pulse";
 
-import { SiteLayout } from "../../../shared/layout";
-import { highlightCode } from "../../../shared/highlight";
+import { SiteLayout } from "../../../shared/layout/Layout";
+import { highlightCode } from "../../../shared/lib/highlight/highlight";
 import type { FeatureData } from "../domain";
 import css from "./Home.module.css";
 

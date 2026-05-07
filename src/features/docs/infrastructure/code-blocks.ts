@@ -2,7 +2,7 @@ import { render, type BeatCleanup } from "@ochairo/beat";
 import { CodeBlock } from "@ochairo/beat-ui";
 import { pulse } from "@ochairo/pulse";
 
-import { highlightCode } from "../../../shared/highlight";
+import { highlightCode } from "../../../shared/lib/highlight/highlight";
 
 export function replaceCodeBlocks(container: HTMLElement): BeatCleanup[] {
   const cleanups: BeatCleanup[] = [];

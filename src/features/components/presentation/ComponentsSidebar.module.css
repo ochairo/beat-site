@@ -1,0 +1,97 @@
+.sidebar {
+  padding: 1.5rem;
+}
+
+.groupTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--beat-ui-color-text-muted);
+  margin: 1.5rem 0 0.4rem 0;
+  padding: 0;
+}
+
+.groupTitleFirst {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--beat-ui-color-text-muted);
+  margin: 0 0 0.4rem 0;
+  padding: 0;
+}
+
+.groupTitleActive {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--beat-ui-color-background-accent-soft);
+  color: var(--beat-ui-color-primary);
+  margin: 1.5rem 0 0.4rem 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+}
+
+.groupTitleFirstActive {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--beat-ui-color-background-accent-soft);
+  color: var(--beat-ui-color-primary);
+  margin: 0 0 0.4rem 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+}
+
+.navList {
+  list-style: none;
+  margin: 0 0 0.25rem 0;
+  padding: 0;
+}
+
+.navLink {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--beat-ui-color-text-muted);
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.navLinkActive {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  background: var(--beat-ui-color-background-accent-soft);
+  color: var(--beat-ui-color-primary);
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.subList {
+  list-style: none;
+  margin: 0.15rem 0 0.25rem 0;
+  padding: 0 0 0 0.75rem;
+  border-left: 1px solid var(--beat-ui-color-border);
+}
+
+.subLink {
+  display: block;
+  padding: 0.2rem 0.5rem;
+  text-decoration: none;
+  font-size: 0.78rem;
+  color: var(--beat-ui-color-text-muted);
+  border-radius: 4px;
+  transition: color 0.12s;
+}
