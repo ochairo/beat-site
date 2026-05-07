@@ -15,8 +15,8 @@ importers:
         specifier: ^1.6.1
         version: 1.6.1
       '@ochairo/pulse':
-        specifier: ^1.5.0
-        version: 1.5.0
+        specifier: ^1.6.0
+        version: 1.6.0
       esbuild-wasm:
         specifier: ^0.28.0
         version: 0.28.0
@@ -396,8 +396,8 @@ packages:
     resolution: {integrity: sha512-5tRMGnO44EVNe23LlwNPShFkQnOC1/I/sRgl5p7OaIjkY/RMkzlbn61l1FXIR1an9iS6c79Sl9jWPY7Kn/1wAg==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/pulse@1.5.0':
-    resolution: {integrity: sha512-9m9qZDhurpk4aRexLJR+jII8v/3CnjccrLklHgVZBQTsHNupvZ5fjLYbfdJ5sYskZZjCshXfwUavvRTmHhgMHg==}
+  '@ochairo/pulse@1.6.0':
+    resolution: {integrity: sha512-wP2wVWR5pmgCfMGnhx28OCWW+sxQ208w8Uk2uYsoKTWbXAySzHbJjzg4p+kmDjVIjCJwtGhGOF4BtUWCunE5WA==}
     engines: {node: '>=20.0.0'}
 
   '@ochairo/scales@1.5.0':
@@ -1233,16 +1233,16 @@ snapshots:
     dependencies:
       '@ochairo/beat': 1.6.0
       '@ochairo/numbers': 1.5.0
-      '@ochairo/pulse': 1.5.0
+      '@ochairo/pulse': 1.6.0
       '@ochairo/scales': 1.5.0
 
   '@ochairo/beat@1.6.0':
     dependencies:
-      '@ochairo/pulse': 1.5.0
+      '@ochairo/pulse': 1.6.0
 
   '@ochairo/numbers@1.5.0': {}
 
-  '@ochairo/pulse@1.5.0': {}
+  '@ochairo/pulse@1.6.0': {}
 
   '@ochairo/scales@1.5.0': {}
 

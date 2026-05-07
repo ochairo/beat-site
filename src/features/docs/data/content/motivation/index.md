@@ -33,6 +33,7 @@ function Dashboard({ socket }: { socket: WebSocket }) {
       if (data.type === "notification") setNotifications((n) => n + 1);
       if (data.type === "message") setMessages((m) => [...m, data.message]);
     };
+
     return () => { socket.onmessage = null; };
   }, [socket]);
 
