@@ -1,6 +1,7 @@
 import { component, type BeatJsxChild } from "@ochairo/beat";
 import {
   AppShell,
+  IconExternalLink,
   IconMoon,
   IconSun,
   Switch,
@@ -32,12 +33,12 @@ export const SiteLayout = component<SiteLayoutProps>((props): BeatJsxChild => {
         Playground
       </a>
       <a
-        href="https://github.com/ochairo/beat"
+        href="https://github.com/ochairo/beat/discussions"
         target="_blank"
         rel="noopener noreferrer"
         class={css["navLink"]!}
       >
-        GitHub
+        Discussions <IconExternalLink size={14} />
       </a>
       <Switch
         defaultChecked={themeController.mode.get() === "dark"}

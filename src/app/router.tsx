@@ -1,15 +1,13 @@
 import { createRouter, type BeatRouteDefinition } from "@ochairo/beat";
 
-import { InMemoryDocRepository, DocsPage } from "../features/docs";
-import {
-  InMemoryComponentRepository,
-  ComponentsPage,
-} from "../features/components";
-import {
-  InMemoryPlaygroundRepository,
-  PlaygroundPage,
-} from "../features/playground";
-import { InMemoryFeatureRepository, HomePage } from "../features/home";
+import { InMemoryDocRepository } from "../features/docs/data/doc-repository";
+import { DocsPage } from "../features/docs/presentation/DocPage";
+import { InMemoryComponentRepository } from "../features/beat-ui/data/component-repository";
+import { ComponentsPage } from "../features/beat-ui/presentation/Components";
+import { InMemoryPlaygroundRepository } from "../features/playground/data/playground-repository";
+import { PlaygroundPage } from "../features/playground/presentation/PlaygroundPage";
+import { InMemoryFeatureRepository } from "../features/home/data/feature-repository";
+import { HomePage } from "../features/home/presentation/Home";
 
 /* ── Composition root: instantiate repositories ── */
 

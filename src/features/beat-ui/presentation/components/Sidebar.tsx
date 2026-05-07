@@ -1,8 +1,8 @@
 import { component, type BeatJsxChild } from "@ochairo/beat";
 import { derived, type Pulse } from "@ochairo/pulse";
 
-import type { NavGroup } from "../domain";
-import css from "./ComponentsSidebar.module.css";
+import type { NavGroup } from "../../domain/types";
+import css from "./Sidebar.module.css";
 
 export interface ComponentsSidebarProps {
   readonly navGroups: readonly NavGroup[];
@@ -16,7 +16,7 @@ export const ComponentsSidebar = component<ComponentsSidebarProps>(
       <div class={css["sidebar"]!}>
         {props.navGroups.map((group, index) => {
           const groupIds = group.items.map(
-            (item) =>
+            (item: string) =>
               props.nameToId[item] ?? item.toLowerCase().replace(/\s+/g, "-"),
           );
           const isGroupActive = derived(props.activeId, (a) =>
@@ -38,7 +38,7 @@ export const ComponentsSidebar = component<ComponentsSidebarProps>(
                 {group.label}
               </div>
               <ul class={css["subList"]!}>
-                {group.items.map((item) => {
+                {group.items.map((item: string) => {
                   const id =
                     props.nameToId[item] ??
                     item.toLowerCase().replace(/\s+/g, "-");

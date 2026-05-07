@@ -1,8 +1,5 @@
-import type {
-  ComponentShowcase,
-  NavGroup,
-  ComponentRepository,
-} from "../domain";
+import type { ComponentShowcase, NavGroup } from "../domain/types";
+import type { ComponentRepository } from "../domain/ports";
 
 const NAV_GROUPS: readonly NavGroup[] = [
   { label: "Actions", items: ["Button", "Badge"] },

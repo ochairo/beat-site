@@ -4,8 +4,8 @@ import { pulse } from "@ochairo/pulse";
 import { highlightCode } from "../../../shared/lib/highlight/highlight";
 import { SiteLayout } from "../../../shared/layout/Layout";
 import { Playground } from "../../../shared/ui/playground/Playground";
-import type { ComponentShowcase, NavGroup } from "../domain";
-import { ComponentsSidebar } from "./ComponentsSidebar";
+import type { ComponentShowcase, NavGroup } from "../domain/types";
+import { ComponentsSidebar } from "./components/Sidebar";
 import css from "./Components.module.css";
 
 export interface ComponentsPageProps {
@@ -82,7 +82,7 @@ export const ComponentsPage = component<ComponentsPageProps>(
                     </div>
                     <Playground
                       code={pulse(showcase.code)}
-                      label="TSX"
+                      label="TSX (Playground)"
                       highlight={(code) => highlightCode(code, "tsx")}
                       {...(showcase.height !== undefined
                         ? { height: showcase.height }
