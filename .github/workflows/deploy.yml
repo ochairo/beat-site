@@ -27,9 +27,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
 
       - run: pnpm typecheck
 
@@ -49,9 +48,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
 
       - run: pnpm bundle:playground
 
