@@ -4,7 +4,7 @@ import {
   type BeatRouteMatch,
 } from "@ochairo/beat";
 
-import type { DocSection } from "../domain";
+import type { DocSection } from "../domain/types";
 import { SiteLayout } from "../../../shared/layout/Layout";
 import { Sidebar } from "./components/sidebar/Sidebar";
 import { replaceCodeBlocks } from "../infrastructure/code-blocks";

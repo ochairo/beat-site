@@ -1,6 +1,8 @@
 name: Validate
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -22,5 +24,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm typecheck
+
+      - run: pnpm bundle:playground
 
       - run: pnpm build

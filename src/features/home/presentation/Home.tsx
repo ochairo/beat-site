@@ -16,7 +16,7 @@ import { pulse } from "@ochairo/pulse";
 
 import { SiteLayout } from "../../../shared/layout/Layout";
 import { highlightCode } from "../../../shared/lib/highlight/highlight";
-import type { FeatureData } from "../domain";
+import type { FeatureData } from "../domain/types";
 import css from "./Home.module.css";
 
 const ICON_COLOR = "var(--beat-ui-color-primary)";

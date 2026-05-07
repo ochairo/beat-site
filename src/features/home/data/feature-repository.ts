@@ -1,4 +1,5 @@
-import type { FeatureData, FeatureRepository } from "../domain";
+import type { FeatureData } from "../domain/types";
+import type { FeatureRepository } from "../domain/ports";
 
 const FEATURES: readonly FeatureData[] = [
   {

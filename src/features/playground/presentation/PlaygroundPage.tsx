@@ -2,7 +2,7 @@ import { component, type BeatJsxChild } from "@ochairo/beat";
 import { Tab, type TabItem } from "@ochairo/beat-ui";
 
 import { SiteLayout } from "../../../shared/layout/Layout";
-import type { PlaygroundTemplate } from "../domain";
+import type { PlaygroundTemplate } from "../domain/types";
 import css from "./PlaygroundPage.module.css";
 
 export interface PlaygroundPageProps {

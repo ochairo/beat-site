@@ -1,4 +1,5 @@
-import type { DocHeading, DocPage, DocSection, DocRepository } from "../domain";
+import type { DocHeading, DocPage, DocSection } from "../domain/types";
+import type { DocRepository } from "../domain/ports";
 
 import motivationMd from "./content/motivation/index.md?raw";
 import quickStartMd from "./content/beat/quick-start.md?raw";

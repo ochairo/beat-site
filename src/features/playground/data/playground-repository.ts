@@ -1,4 +1,5 @@
-import type { PlaygroundTemplate, PlaygroundRepository } from "../domain";
+import type { PlaygroundTemplate } from "../domain/types";
+import type { PlaygroundRepository } from "../domain/ports";
 
 const TEMPLATES: readonly PlaygroundTemplate[] = [
   {

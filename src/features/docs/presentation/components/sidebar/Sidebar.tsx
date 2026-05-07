@@ -4,7 +4,7 @@ import {
   type BeatRouteMatch,
 } from "@ochairo/beat";
 
-import type { DocSection, DocHeading } from "../../../domain";
+import type { DocSection, DocHeading, DocPage } from "../../../domain/types";
 import css from "./Sidebar.module.css";
 
 export interface SidebarProps {
@@ -95,7 +95,7 @@ export const Sidebar = component<SidebarProps>((props): BeatJsxChild => {
               {section.title}
             </div>
             <ul class={css["navList"]!}>
-              {section.pages.map((page) => {
+              {section.pages.map((page: DocPage) => {
                 const active = currentSlug === page.slug;
                 return (
                   <li>
