@@ -12,8 +12,8 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0
       '@ochairo/beat-ui':
-        specifier: ^1.6.4
-        version: 1.6.4
+        specifier: ^1.6.5
+        version: 1.6.5
       '@ochairo/pulse':
         specifier: ^1.6.0
         version: 1.6.0
@@ -384,8 +384,8 @@ packages:
   '@mermaid-js/parser@1.1.0':
     resolution: {integrity: sha512-gxK9ZX2+Fex5zu8LhRQoMeMPEHbc73UKZ0FQ54YrQtUxE1VVhMwzeNtKRPAu5aXks4FasbMe4xB4bWrmq6Jlxw==}
 
-  '@ochairo/beat-ui@1.6.4':
-    resolution: {integrity: sha512-TFy0RAmMyUPJvY8zHsi/drGkGBLHMpxSibFUrLBj9gwTH8oOnxTkIWQ7uMaqv4wExCXg/yzjdnnV5EZqCJYfbA==}
+  '@ochairo/beat-ui@1.6.5':
+    resolution: {integrity: sha512-ivgFytowwG2MCfV0q71ZL5ippwXMhxBHfUf2stussJK/GEfUh1cuei5pxJXjc65+Cxskl/e1Sa+fpz3uR5Xz3w==}
     engines: {node: '>=20.0.0'}
 
   '@ochairo/beat@1.6.0':
@@ -1229,7 +1229,7 @@ snapshots:
     dependencies:
       langium: 4.2.3
 
-  '@ochairo/beat-ui@1.6.4':
+  '@ochairo/beat-ui@1.6.5':
     dependencies:
       '@ochairo/beat': 1.6.0
       '@ochairo/numbers': 1.5.0

@@ -38,6 +38,7 @@ const BEAT_UI_COMPONENTS = [
   "RadioButton",
   "ScatterPlot",
   "Sparkline",
+  "Slider",
   "Switch",
   "TextArea",
   // composites
@@ -98,6 +99,7 @@ const BEAT_UI_ICONS = [
   "IconMoreVertical",
   "IconPackage",
   "IconPlay",
+  "IconPause",
   "IconPlus",
   "IconPulse",
   "IconReact",

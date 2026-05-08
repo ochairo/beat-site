@@ -838,120 +838,138 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
                   <th class={`${css["th"]!} ${css["right"]!}`}>Last 7 Days</th>
                 </tr>
               </thead>
-              <tbody>
-                {coins.map((coin) => {
-                  const priceDisplay = derived(coin.price, fmt);
-                  const change1hDisplay = derived(coin.change1h, fmtChange);
-                  const change24hDisplay = derived(coin.change24h, fmtChange);
-                  const change7dDisplay = derived(coin.change7d, fmtChange);
-                  const mcapDisplay = derived(coin.price, (p) =>
-                    fmtCompact(p * coin.supply),
-                  );
-                  const volumeDisplay = derived(coin.volume, fmtCompact);
-                  const volMcapDisplay = derived(coin.volume, (vol) => {
-                    const mcap = coin.price.get() * coin.supply;
-                    return `${((vol / mcap) * 100).toFixed(2)}%`;
-                  });
-                  const supplyDisplay = fmtSupply(
-                    coin.supply,
-                    coin.meta.symbol,
-                  );
-                  const pctATHDisplay = derived(coin.price, (p) =>
-                    fmtPctFromATH(p, coin.ath),
-                  );
-                  const strokeColor = pulse(
-                    coin.change7d.get() >= 0
-                      ? "var(--beat-ui-color-success)"
-                      : "var(--beat-ui-color-danger)",
-                  );
-                  onCleanup(
-                    coin.change7d.on(({ currentValue }) => {
-                      strokeColor.set(
-                        currentValue >= 0
-                          ? "var(--beat-ui-color-success)"
-                          : "var(--beat-ui-color-danger)",
-                      );
-                    }),
-                  );
-
-                  return (
-                    <tr class={css["tr"]!}>
-                      <td class={css["td"]!}>
-                        <span class={css["rank"]!}>{coin.meta.rank}</span>
-                      </td>
-                      <td class={css["td"]!}>
-                        <div class={css["coinName"]!}>
-                          <div class={css["coinInitial"]!}>
-                            {coin.meta.symbol[0]}
-                          </div>
-                          <div>
-                            <div class={css["coinTitle"]!}>
-                              {coin.meta.name}
-                            </div>
-                            <div class={css["coinSymbol"]!}>
-                              {coin.meta.symbol}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td
-                        class={`${css["td"]!} ${css["right"]!}`}
-                        ref={(el) => {
-                          const td = el as HTMLTableCellElement;
-                          onCleanup(
-                            coin.flashClass.on(({ currentValue }) => {
-                              td.className = `${css["td"]!} ${css["right"]!}${currentValue ? ` ${currentValue}` : ""}`;
-                            }),
-                          );
-                        }}
-                      >
-                        <span class={css["price"]!} text={priceDisplay} />
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <Badge tone={tone(coin.change1h.get())} size="sm">
-                          <span text={change1hDisplay} />
-                        </Badge>
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <Badge tone={tone(coin.change24h.get())} size="sm">
-                          <span text={change24hDisplay} />
-                        </Badge>
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <Badge tone={tone(coin.change7d.get())} size="sm">
-                          <span text={change7dDisplay} />
-                        </Badge>
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <span class={css["price"]!} text={mcapDisplay} />
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <span class={css["muted"]!} text={volumeDisplay} />
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <span class={css["muted"]!} text={volMcapDisplay} />
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <span class={css["muted"]!}>{supplyDisplay}</span>
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <Badge tone="danger" size="sm">
-                          <span text={pctATHDisplay} />
-                        </Badge>
-                      </td>
-                      <td class={`${css["td"]!} ${css["right"]!}`}>
-                        <Sparkline
-                          values={coin.history}
-                          width={100}
-                          height={32}
-                          stroke={strokeColor}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
             </table>
+            <div class={css["tableBodyWrapper"]!}>
+              <table class={css["table"]!}>
+                <colgroup>
+                  <col style="width:48px" />
+                  <col style="width:200px" />
+                  <col style="width:110px" />
+                  <col style="width:80px" />
+                  <col style="width:80px" />
+                  <col style="width:80px" />
+                  <col style="width:110px" />
+                  <col style="width:110px" />
+                  <col style="width:90px" />
+                  <col style="width:130px" />
+                  <col style="width:90px" />
+                  <col style="width:110px" />
+                </colgroup>
+                <tbody>
+                  {coins.map((coin) => {
+                    const priceDisplay = derived(coin.price, fmt);
+                    const change1hDisplay = derived(coin.change1h, fmtChange);
+                    const change24hDisplay = derived(coin.change24h, fmtChange);
+                    const change7dDisplay = derived(coin.change7d, fmtChange);
+                    const mcapDisplay = derived(coin.price, (p) =>
+                      fmtCompact(p * coin.supply),
+                    );
+                    const volumeDisplay = derived(coin.volume, fmtCompact);
+                    const volMcapDisplay = derived(coin.volume, (vol) => {
+                      const mcap = coin.price.get() * coin.supply;
+                      return `${((vol / mcap) * 100).toFixed(2)}%`;
+                    });
+                    const supplyDisplay = fmtSupply(
+                      coin.supply,
+                      coin.meta.symbol,
+                    );
+                    const pctATHDisplay = derived(coin.price, (p) =>
+                      fmtPctFromATH(p, coin.ath),
+                    );
+                    const strokeColor = pulse(
+                      coin.change7d.get() >= 0
+                        ? "var(--beat-ui-color-success)"
+                        : "var(--beat-ui-color-danger)",
+                    );
+                    onCleanup(
+                      coin.change7d.on(({ currentValue }) => {
+                        strokeColor.set(
+                          currentValue >= 0
+                            ? "var(--beat-ui-color-success)"
+                            : "var(--beat-ui-color-danger)",
+                        );
+                      }),
+                    );
+
+                    return (
+                      <tr class={css["tr"]!}>
+                        <td class={css["td"]!}>
+                          <span class={css["rank"]!}>{coin.meta.rank}</span>
+                        </td>
+                        <td class={css["td"]!}>
+                          <div class={css["coinName"]!}>
+                            <div class={css["coinInitial"]!}>
+                              {coin.meta.symbol[0]}
+                            </div>
+                            <div>
+                              <div class={css["coinTitle"]!}>
+                                {coin.meta.name}
+                              </div>
+                              <div class={css["coinSymbol"]!}>
+                                {coin.meta.symbol}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td
+                          class={`${css["td"]!} ${css["right"]!}`}
+                          ref={(el) => {
+                            const td = el as HTMLTableCellElement;
+                            onCleanup(
+                              coin.flashClass.on(({ currentValue }) => {
+                                td.className = `${css["td"]!} ${css["right"]!}${currentValue ? ` ${currentValue}` : ""}`;
+                              }),
+                            );
+                          }}
+                        >
+                          <span class={css["price"]!} text={priceDisplay} />
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <Badge tone={tone(coin.change1h.get())} size="sm">
+                            <span text={change1hDisplay} />
+                          </Badge>
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <Badge tone={tone(coin.change24h.get())} size="sm">
+                            <span text={change24hDisplay} />
+                          </Badge>
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <Badge tone={tone(coin.change7d.get())} size="sm">
+                            <span text={change7dDisplay} />
+                          </Badge>
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <span class={css["price"]!} text={mcapDisplay} />
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <span class={css["muted"]!} text={volumeDisplay} />
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <span class={css["muted"]!} text={volMcapDisplay} />
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <span class={css["muted"]!}>{supplyDisplay}</span>
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <Badge tone="danger" size="sm">
+                            <span text={pctATHDisplay} />
+                          </Badge>
+                        </td>
+                        <td class={`${css["td"]!} ${css["right"]!}`}>
+                          <Sparkline
+                            values={coin.history}
+                            width={100}
+                            height={32}
+                            stroke={strokeColor}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </Card>
       </div>

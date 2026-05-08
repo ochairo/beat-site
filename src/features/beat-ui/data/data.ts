@@ -7,6 +7,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     items: [
       "Input",
       "Switch",
+      "Slider",
       "CheckBox",
       "RadioGroup",
       "TextArea",
@@ -98,6 +99,23 @@ return (
     uncheckedIcon={<IconMoon size={12} />}
   >
   </Switch>
+)`,
+  },
+  {
+    id: "slider",
+    name: "Slider",
+    tag: "atom",
+    category: "Form",
+    code: `const value = pulse(50);
+
+return (
+  <Slider
+    min={0}
+    max={100}
+    step={1}
+    value={value}
+    onValueChange={(v) => value.set(v)}
+  />
 )`,
   },
   {
@@ -675,4 +693,3 @@ return (
 </span>`,
   },
 ];
-

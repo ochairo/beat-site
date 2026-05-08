@@ -57,8 +57,12 @@
 
 .tableWrapper {
   overflow-x: auto;
+}
+
+.tableBodyWrapper {
+  overflow-x: auto;
   overflow-y: auto;
-  max-height: 350px;
+  max-height: 320px;
 }
 
 .table {
@@ -78,10 +82,7 @@
   border-bottom: 1px solid var(--beat-ui-color-border);
   white-space: nowrap;
   text-align: left;
-  position: sticky;
-  top: 0;
   background: var(--beat-ui-color-background);
-  z-index: 1;
 }
 
 .tr {

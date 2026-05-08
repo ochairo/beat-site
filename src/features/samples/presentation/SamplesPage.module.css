@@ -25,6 +25,6 @@
 }
 
 .page :global([data-part="panel"]) {
-  max-height: 70vh;
+  max-height: 71vh;
   overflow-y: auto;
 }
