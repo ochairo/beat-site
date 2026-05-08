@@ -1,4 +1,4 @@
-import type { MockHttpClient } from "../../../../shared/lib/http/http-client";
+import type { MockHttpClient } from "../../../shared/lib/http/http-client";
 import { TASK_BOARD_DATA } from "./task/data";
 import { COIN_META } from "./crypto/data";
 
