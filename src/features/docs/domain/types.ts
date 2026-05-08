@@ -14,4 +14,5 @@ export interface DocPage {
 export interface DocSection {
   readonly title: string;
   readonly pages: readonly DocPage[];
+  readonly foldable?: boolean;
 }

@@ -29,6 +29,9 @@ export const SiteLayout = component<SiteLayoutProps>((props): BeatJsxChild => {
       <a href="/beat-site/beat-ui" class={css["navLink"]!}>
         BeatUI
       </a>
+      <a href="/beat-site/samples" class={css["navLink"]!}>
+        Samples
+      </a>
       <a href="/beat-site/stackblitz" class={css["navLink"]!}>
         StackBlitz
       </a>

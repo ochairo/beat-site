@@ -15,11 +15,46 @@ The core ideas are:
 - **The core knows nothing about specific plugins** — it delegates through contracts
 - **Plugins are added or removed without modifying the core**
 
+<!-- markdownlint-disable -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 378" style="max-width:100%;width:800px;height:auto;display:block;margin:1.5em auto">
+  <style>
+    .p-badge { font: 700 11px/1 system-ui,-apple-system,sans-serif; letter-spacing: 0.06em; }
+    .p-sub   { font: 11px/1 system-ui,-apple-system,sans-serif; fill: var(--beat-ui-color-text-muted, #a9b1d6); }
+    .p-note  { font: 11px/1 system-ui,-apple-system,sans-serif; fill: var(--beat-ui-color-text-muted, #a9b1d6); }
+  </style>
+  <defs>
+    <marker id="arr-inward-p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="var(--beat-ui-color-text-muted, #a9b1d6)"/>
+    </marker>
+  </defs>
+  <!-- API ring — blue; rx=320/ry=148 matches clean-architecture outer ring -->
+  <ellipse cx="410" cy="190" rx="320" ry="148" stroke="#7aa2f7" stroke-width="1.5" fill="#7aa2f7" fill-opacity="0.05"/>
+  <!-- Plugins ring — purple -->
+  <ellipse cx="410" cy="190" rx="217" ry="101" stroke="#bb9af7" stroke-width="1.5" fill="#bb9af7" fill-opacity="0.08"/>
+  <!-- Core ring — green -->
+  <ellipse cx="410" cy="190" rx="109" ry="52"  stroke="#9ece6a" stroke-width="1.5" fill="#9ece6a" fill-opacity="0.13"/>
+  <!-- API band label — 15px clear of API ring stroke (top y=42) -->
+  <text x="410" y="57"  text-anchor="middle" class="p-badge" fill="#7aa2f7">API</text>
+  <text x="410" y="71"  text-anchor="middle" class="p-sub">index.ts · public surface · composition root</text>
+  <!-- Plugins band label — 15px clear of Plugins ring stroke (top y=89) -->
+  <text x="410" y="104" text-anchor="middle" class="p-badge" fill="#bb9af7">PLUGINS</text>
+  <text x="410" y="118" text-anchor="middle" class="p-sub">self-contained implementations</text>
+  <!-- Core center label -->
+  <text x="410" y="184" text-anchor="middle" class="p-badge" fill="#9ece6a">CORE</text>
+  <text x="410" y="198" text-anchor="middle" class="p-sub">pipeline · registry · contracts</text>
+  <!-- Dependency direction annotation -->
+  <line x1="630" y1="355" x2="553" y2="355"
+        stroke="var(--beat-ui-color-text-muted, #a9b1d6)" stroke-width="1"
+        marker-end="url(#arr-inward-p)"/>
+  <text x="635" y="359" class="p-note">dependencies point inward</text>
+</svg>
+<!-- markdownlint-enable -->
+
 ## When to Use
 
 This architecture fits libraries that:
 
-- Process input through a pipeline (parse → transform → render)
+- Process input through a pipeline (parse → render, or parse → transform → render)
 - Support multiple variants of the same operation (diagram types, language grammars, output formats)
 - Need to be extensible by consumers (custom plugins, third-party extensions)
 
@@ -67,13 +102,33 @@ Plugins depend on core types only. They never import from other plugins.
 
 ## Plugin Contract
 
-The core defines a contract that all plugins must implement:
+The core defines a contract that all plugins must implement. The shape depends on what the pipeline requires — a simple two-stage pipeline might only need `parse` and `render`:
 
 ```typescript
 // core/types.ts
+
+// ASTNode is whatever intermediate representation your domain needs.
+// Define it concretely — don't use `unknown` or `any`.
+export interface ASTNode {
+  readonly type: string;
+  readonly children?: readonly ASTNode[];
+  readonly value?: string;
+}
+
 export interface PluginDefinition {
   readonly id: string;
   parse(input: string): ASTNode;
+  render(ast: ASTNode): string;
+}
+```
+
+If your pipeline has a transform stage, add it to the contract:
+
+```typescript
+export interface PluginDefinition {
+  readonly id: string;
+  parse(input: string): ASTNode;
+  transform?(ast: ASTNode): ASTNode; // optional — only implement when needed
   render(ast: ASTNode): string;
 }
 ```
@@ -102,6 +157,9 @@ import type { PluginDefinition } from "./types";
 const plugins = new Map<string, PluginDefinition>();
 
 export function registerPlugin(plugin: PluginDefinition): void {
+  if (plugins.has(plugin.id)) {
+    throw new Error(`Plugin "${plugin.id}" is already registered.`);
+  }
   plugins.set(plugin.id, plugin);
 }
 
@@ -109,6 +167,11 @@ export function getPlugin(id: string): PluginDefinition | undefined {
   return plugins.get(id);
 }
 ```
+
+> **Note on the singleton registry:** The registry uses module-level state, which means it is shared across the entire runtime. This is convenient but has two trade-offs to be aware of:
+>
+> 1. **Tests can pollute each other** if they register plugins and the state is not reset between runs. Export a `clearRegistry()` helper (or use a class-based registry) in your test utilities.
+> 2. **Duplicate registration throws** — this is intentional. If you need hot-reloading or overridable plugins, export a `replacePlugin(plugin: PluginDefinition): void` function that skips the duplicate check.
 
 ## Pipeline
 
@@ -132,28 +195,35 @@ The pipeline never contains plugin-specific logic. It delegates entirely through
 ## Dependency Rules
 
 ```mermaid
-graph TD
+flowchart TD
   API["index.ts (public API)"]
   CORE["core/ (pipeline, registry, contracts)"]
-  PA["plugin A"]
-  PB["plugin B"]
-  PC["plugin C"]
 
+  subgraph PLUGINS ["plugins/"]
+    direction LR
+    PA["plugin A"]
+    PB["plugin B"]
+    PC["plugin C"]
+    PA x--x PB
+    PB x--x PC
+  end
+
+  API --> PLUGINS
   API --> CORE
-  API --> PA
-  API --> PB
-  API --> PC
   PA --> CORE
   PB --> CORE
   PC --> CORE
-  PA x--x PB
-  PB x--x PC
 
-  style API fill:#4a9eff,color:#fff,stroke:none
-  style CORE fill:#636e72,color:#fff,stroke:none
-  style PA fill:#6c5ce7,color:#fff,stroke:none
-  style PB fill:#6c5ce7,color:#fff,stroke:none
-  style PC fill:#6c5ce7,color:#fff,stroke:none
+  style API fill:#7aa2f7,color:#15161e,stroke:none
+  style CORE fill:#9ece6a,color:#15161e,stroke:none
+  style PA fill:#bb9af7,color:#15161e,stroke:none
+  style PB fill:#bb9af7,color:#15161e,stroke:none
+  style PC fill:#bb9af7,color:#15161e,stroke:none
+
+  style PLUGINS fill:#bb9af720,stroke:#bb9af7,color:#15161e
+  linkStyle 0,1 stroke:#a9b1d6
+  linkStyle 2,3 stroke:#7aa2f7
+  linkStyle 4,5,6 stroke:#bb9af7
 ```
 
 | Layer | Can import from |
@@ -166,18 +236,43 @@ graph TD
 
 **The core cannot import from plugins.** The core defines contracts — plugins implement them. The public API (`index.ts`) registers built-in plugins with the core.
 
+## Public API
+
+`index.ts` is the only entry point consumers import from. It registers the built-in plugins and re-exports the public surface:
+
+```typescript
+// index.ts
+import { registerPlugin, getPlugin } from "./core/registry";
+import { process } from "./core/pipeline";
+import { pluginA } from "./plugins/plugin-a";
+import { pluginB } from "./plugins/plugin-b";
+
+// Register all built-in plugins at import time
+registerPlugin(pluginA);
+registerPlugin(pluginB);
+
+// Re-export only what consumers need
+export { registerPlugin, getPlugin, process };
+export type { PluginDefinition, ASTNode } from "./core/types";
+```
+
+Consumers import from the library root, never from internal paths.
+
 ## Consumer Extensibility
 
 Because the contract is public, consumers can create their own plugins:
 
 ```typescript
 import { registerPlugin, process } from "my-library";
+import type { PluginDefinition } from "my-library";
 
-registerPlugin({
+const customPlugin: PluginDefinition = {
   id: "custom",
   parse(input) { /* ... */ },
   render(ast) { /* ... */ },
-});
+};
+
+registerPlugin(customPlugin);
 
 const result = process("custom", input);
 ```

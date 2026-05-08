@@ -1,5 +1,5 @@
 import type { PlaygroundTemplate } from "./types";
 
-export interface PlaygroundRepository {
+export interface StackBlitzPort {
   getTemplates(): Promise<readonly PlaygroundTemplate[]>;
 }

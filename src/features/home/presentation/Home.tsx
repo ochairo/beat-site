@@ -1,5 +1,7 @@
 import {
+  Show,
   component,
+  onMount,
   type BeatJsxChild,
   type BeatRouteMatch,
 } from "@ochairo/beat";
@@ -16,6 +18,7 @@ import { pulse } from "@ochairo/pulse";
 
 import { SiteLayout } from "../../../shared/layout/Layout";
 import { highlightCode } from "../../../shared/lib/highlight/highlight";
+import type { HomePort } from "../domain/ports";
 import type { FeatureData } from "../domain/types";
 import css from "./Home.module.css";
 
@@ -32,10 +35,16 @@ const ICON_MAP: Record<string, BeatJsxChild> = {
 
 export interface HomePageProps {
   readonly match: BeatRouteMatch;
-  readonly features: readonly FeatureData[];
+  readonly homePort: HomePort;
 }
 
 export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
+  const features = pulse<readonly FeatureData[] | null>(null);
+
+  onMount(() => {
+    void props.homePort.getFeatures().then((data) => features.set(data));
+  });
+
   return (
     <SiteLayout contentStyle="padding: 0; overflow: hidden">
       <div class={css["page"]!}>
@@ -94,15 +103,19 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
           </svg>
         </div>
         <section class={css["features"]!}>
-          {props.features.map((feature) => (
-            <div class={css["featureCard"]!}>
-              <h3 class={css["featureTitle"]!}>
-                {ICON_MAP[feature.icon] ?? null}
-                {feature.title}
-              </h3>
-              <p class={css["featureDesc"]!}>{feature.description}</p>
-            </div>
-          ))}
+          <Show when={features} mapValue={(v) => v !== null}>
+            {() =>
+              features.get()!.map((feature) => (
+                <div class={css["featureCard"]!}>
+                  <h3 class={css["featureTitle"]!}>
+                    {ICON_MAP[feature.icon] ?? null}
+                    {feature.title}
+                  </h3>
+                  <p class={css["featureDesc"]!}>{feature.description}</p>
+                </div>
+              ))
+            }
+          </Show>
         </section>
         <footer class={css["footer"]!}>
           <div class={css["footerLine"]!} />

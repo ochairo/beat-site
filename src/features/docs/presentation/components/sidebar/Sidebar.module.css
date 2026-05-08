@@ -22,6 +22,36 @@
   padding: 0;
 }
 
+.sectionTitleToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--beat-ui-color-text-muted);
+  margin: 1.5rem 0 0.4rem 0;
+  padding: 0;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.chevron {
+  font-style: normal;
+  font-size: 0.6rem;
+  transition: transform 0.15s;
+  display: inline-block;
+}
+
+.collapsibleContent {
+  overflow: hidden;
+}
+
 .navList {
   list-style: none;
   margin: 0;

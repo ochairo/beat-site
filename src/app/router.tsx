@@ -1,42 +1,37 @@
 import { createRouter, type BeatRouteDefinition } from "@ochairo/beat";
 
-import { InMemoryDocRepository } from "../features/docs/data/doc-repository";
+import { HttpDocRepository } from "../features/docs/data/doc-repository";
 import { DocsPage } from "../features/docs/presentation/DocPage";
-import { InMemoryComponentRepository } from "../features/beat-ui/data/component-repository";
+import { HttpComponentRepository } from "../features/beat-ui/data/component-repository";
 import { BeatUIPage } from "../features/beat-ui/presentation/BeatUIPage";
-import { InMemoryPlaygroundRepository } from "../features/stackblitz/data/playground-repository";
+import { HttpPlaygroundRepository } from "../features/stackblitz/data/playground-repository";
 import { StackBlitzPage } from "../features/stackblitz/presentation/StackBlitzPage";
-import { InMemoryFeatureRepository } from "../features/home/data/feature-repository";
+import { HttpFeatureRepository } from "../features/home/data/feature-repository";
 import { HomePage } from "../features/home/presentation/Home";
+import { HttpTaskBoardRepository } from "../features/samples/data/task/repository";
+import { HttpCryptoDashboardRepository } from "../features/samples/data/crypto/repository";
+import { SamplesPage } from "../features/samples/presentation/SamplesPage";
+import { httpClient } from "./http-client";
 
 /* ── Composition root: instantiate repositories ── */
 
-const docRepository = new InMemoryDocRepository();
-const componentRepository = new InMemoryComponentRepository();
-const playgroundRepository = new InMemoryPlaygroundRepository();
-const featureRepository = new InMemoryFeatureRepository();
-
-/* ── Load data from repositories ── */
-
-const [docSections, navGroups, showcases, templates, features] =
-  await Promise.all([
-    docRepository.getDocSections(),
-    componentRepository.getNavGroups(),
-    componentRepository.getShowcases(),
-    playgroundRepository.getTemplates(),
-    featureRepository.getFeatures(),
-  ]);
+const docRepository = new HttpDocRepository(httpClient);
+const componentRepository = new HttpComponentRepository(httpClient);
+const playgroundRepository = new HttpPlaygroundRepository(httpClient);
+const featureRepository = new HttpFeatureRepository(httpClient);
+const taskBoardRepository = new HttpTaskBoardRepository(httpClient);
+const cryptoDashboardRepository = new HttpCryptoDashboardRepository(httpClient);
 
 /* ── Define routes ── */
 
 const routes: readonly BeatRouteDefinition[] = [
   {
     path: "/",
-    view: (match) => <HomePage match={match} features={features} />,
+    view: (match) => <HomePage match={match} homePort={featureRepository} />,
   },
   {
     path: "/docs/:slug",
-    view: (match) => <DocsPage match={match} sections={docSections} />,
+    view: (match) => <DocsPage match={match} docsPort={docRepository} />,
   },
   {
     path: "/docs",
@@ -45,11 +40,25 @@ const routes: readonly BeatRouteDefinition[] = [
   },
   {
     path: "/stackblitz",
-    view: () => <StackBlitzPage templates={templates} />,
+    view: () => <StackBlitzPage stackBlitzPort={playgroundRepository} />,
   },
   {
     path: "/beat-ui",
-    view: () => <BeatUIPage navGroups={navGroups} showcases={showcases} />,
+    view: () => (
+      <BeatUIPage
+        navGroupPort={componentRepository}
+        showcasePort={componentRepository}
+      />
+    ),
+  },
+  {
+    path: "/samples",
+    view: () => (
+      <SamplesPage
+        taskBoardPort={taskBoardRepository}
+        cryptoDashboardPort={cryptoDashboardRepository}
+      />
+    ),
   },
 ];
 

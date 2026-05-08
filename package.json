@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ochairo/beat": "^1.6.0",
-    "@ochairo/beat-ui": "^1.6.1",
+    "@ochairo/beat-ui": "^1.6.2",
     "@ochairo/pulse": "^1.6.0",
     "esbuild-wasm": "^0.28.0",
     "highlight.js": "^11.11.1",

@@ -1,48 +1,11 @@
+import type { HomePort } from "../domain/ports";
+import type { HttpClient } from "../../../shared/lib/http/http-client";
 import type { FeatureData } from "../domain/types";
-import type { FeatureRepository } from "../domain/ports";
 
-const FEATURES: readonly FeatureData[] = [
-  {
-    icon: "reactivity",
-    title: "Fine-Grained Reactivity",
-    description:
-      "Pulse's exact-path subscriptions update only the DOM nodes that depend on the changed value. No diffing, no virtual DOM.",
-  },
-  {
-    icon: "direct-dom",
-    title: "Direct DOM",
-    description:
-      "JSX compiles to real DOM nodes. No reconciler overhead. Updates happen at the binding site, not the component boundary.",
-  },
-  {
-    icon: "router",
-    title: "Explicit Router",
-    description:
-      "SPA router with typed params, prefetch, guards, named outlets, and route-level async loaders. All routing state is reactive and inspectable.",
-  },
-  {
-    icon: "resource",
-    title: "Async Resources",
-    description:
-      "First-class async state with explicit loading, error, and data. Caching, debounce, and stale-while-refresh built in.",
-  },
-  {
-    icon: "typescript",
-    title: "Strict TypeScript",
-    description:
-      "No any types. Full type inference for route params, resource state, and component props. Zero compromise.",
-  },
-  {
-    icon: "run-once",
-    title: "Run-Once Components",
-    description:
-      "Components execute exactly once. Only the DOM nodes bound to reactive state update. No re-renders, no stale closures, no dependency arrays.",
-  },
-];
+export class HttpFeatureRepository implements HomePort {
+  constructor(private readonly http: HttpClient) {}
 
-export class InMemoryFeatureRepository implements FeatureRepository {
   async getFeatures(): Promise<readonly FeatureData[]> {
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    return FEATURES;
+    return this.http.get<readonly FeatureData[]>("/api/home/features");
   }
 }

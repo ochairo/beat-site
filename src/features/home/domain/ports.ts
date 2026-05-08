@@ -1,5 +1,5 @@
 import type { FeatureData } from "./types";
 
-export interface FeatureRepository {
+export interface HomePort {
   getFeatures(): Promise<readonly FeatureData[]>;
 }

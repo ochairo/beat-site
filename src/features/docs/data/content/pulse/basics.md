@@ -1,4 +1,4 @@
-# Quick Start
+# Basics
 
 Get up and running with Pulse in under a minute.
 

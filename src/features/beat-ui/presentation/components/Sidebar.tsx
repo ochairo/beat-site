@@ -47,7 +47,13 @@ export const ComponentsSidebar = component<ComponentsSidebarProps>(
                       <a
                         href={`#${id}`}
                         class={css["subLink"]!}
-                        onClick={() => props.activeId.set(id)}
+                        onClick={(e: MouseEvent) => {
+                          e.preventDefault();
+                          props.activeId.set(id);
+                          document
+                            .getElementById(id)
+                            ?.scrollIntoView({ behavior: "smooth" });
+                        }}
                       >
                         {item}
                       </a>

@@ -1,13 +1,17 @@
 import mermaid from "mermaid";
 
-let initialized = false;
+function isDarkMode(): boolean {
+  return (
+    document.documentElement.dataset["beatUiMode"] === "dark" ||
+    (document.documentElement.dataset["beatUiMode"] === undefined &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+  );
+}
 
 function initMermaid(): void {
-  if (initialized) return;
-  initialized = true;
   mermaid.initialize({
     startOnLoad: false,
-    theme: "dark",
+    theme: isDarkMode() ? "dark" : "default",
     fontFamily: "system-ui, -apple-system, sans-serif",
   });
 }
