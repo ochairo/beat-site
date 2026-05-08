@@ -104,7 +104,7 @@
 .heartbeatLine {
   max-width: 1400px;
   min-width: 1400px;
-  margin: 0 auto;
+  margin: 1rem auto;
   padding: 0 2rem;
   height: 80px;
   display: flex;

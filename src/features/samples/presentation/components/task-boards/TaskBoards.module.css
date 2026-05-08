@@ -132,6 +132,8 @@
   gap: 0.375rem;
   padding: 0.5rem;
   min-height: 60px;
+  background: var(--beat-ui-color-border);
+  /* border-radius: var(--beat-ui-radius-md); */
 }
 
 /* ── Card wrapper (drag handle) ── */
