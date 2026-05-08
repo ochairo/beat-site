@@ -99,5 +99,5 @@ Writes apply immediately inside the batch. Listeners are deferred until the batc
 
 ## Next steps
 
-- [API](./api.md) — full reference for every pulse method and type
-- [Integration](./integration.md) — adding Pulse to an existing project
+- [API](./api) — full reference for every pulse method and type
+- [Integration](./integration) — adding Pulse to an existing project

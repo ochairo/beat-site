@@ -1,23 +1,10 @@
-# Beat Compiler Contract
+# Compiler
 
-This document describes the current compiler-facing contract for Beat's JSX transform.
+`@ochairo/beat/vite-plugin` configures Beat as the JSX import source for Vite and lowers intrinsic binding syntax into runtime props.
 
-## Scope
+## Setup
 
-The current compiler contract is implemented by `@ochairo/beat/vite-plugin`.
-
-Its job is intentionally narrow:
-
-- configure Beat as the JSX import source for Vite
-- lower explicit intrinsic binding syntax into internal runtime props
-- avoid overreaching into unrelated JSX or application code
-
-Beat does not currently ship a whole-program optimizing compiler.
-The current contract is selective and targeted at hot-path authoring patterns that Beat can support cleanly.
-
-## Required Setup
-
-TypeScript:
+**TypeScript (`tsconfig.json`):**
 
 ```json
 {
@@ -28,7 +15,7 @@ TypeScript:
 }
 ```
 
-Vite:
+**Vite (`vite.config.ts`):**
 
 ```ts
 import { defineConfig } from "vite";
@@ -39,112 +26,39 @@ export default defineConfig({
 });
 ```
 
-## Current Lowering Rules
+## Lowering Rules
 
 ### Beat Runtime Components
 
-Beat control-flow and routing components stay on the normal JSX runtime path.
+Control-flow and routing components — `Show`, `For`, `Link`, `Outlet` — stay on the normal JSX runtime path and are not transformed by the plugin.
 
-That includes component forms such as:
+### Intrinsic Bindings
 
-- `<Show ...>`
-- `<For ...>`
-- `<Link ...>`
-- `<Outlet ...>`
-
-These components are handled by Beat's JSX runtime directly rather than by a Vite-specific lowering pass.
-
-### Explicit Intrinsic Bindings
-
-The plugin lowers these intrinsic bindings on lowercase DOM tags:
+The plugin lowers these bindings on lowercase DOM tags:
 
 - `text={value}`
 - `class:name={value}`
 - `style:name={value}`
 - `prop:name={value}`
 
-Conceptually:
-
 ```tsx
 <button text={label} class:active={isActive} prop:value={value} />
 ```
 
-becomes internal Beat runtime props that are handled by the JSX runtime and DOM binding helpers.
-
-These internal props are implementation details:
-
-- `__beatText`
-- `__beatClassBindings`
-- `__beatStyleBindings`
-- `__beatPropertyBindings`
-
-Authors should write the public binding syntax, not the internal prop names.
-
-### Safe Single-Child Text Lowering
-
-For lowercase intrinsic tags only, Beat may lower a single child expression into the same internal text-binding path when all of these are true:
-
-- there is exactly one meaningful child expression
-- there is no explicit `text={...}` binding already present
-- the transform can preserve semantics without touching mixed-content structure
-
-Conceptually:
+Style property names containing non-alphanumeric characters (e.g. hyphens) are quoted as string keys:
 
 ```tsx
-<button>{label}</button>
+<span style:background-color={bgColor} />
+// → __beatStyleBindings={{ "background-color": bgColor }}
 ```
 
-may lower into the same internal text-binding path as:
+### Single-Child Text Lowering
+
+A single child — expression or plain text — on a lowercase intrinsic tag is lowered into the text-binding path, provided no explicit `text={...}` is already present:
 
 ```tsx
-<button text={label} />
+<button>{label}</button>   // → __beatText={label}
+<button>hello</button>    // → __beatText={"hello"}
 ```
 
-Beat intentionally does not do this for mixed content such as:
-
-```tsx
-<button>
-  prefix {label}
-</button>
-```
-
-## Stability Expectations
-
-- the public syntax documented above is the contract
-- the exact generated internal prop names are not public API
-- patch releases may fix incorrect transforms or non-overreach bugs without changing the documented public syntax
-- minor releases may expand the lowering surface additively
-- breaking changes to the documented lowering contract are reserved for future major versions
-
-## Non-Goals In The Current Compiler
-
-Beat does not currently promise:
-
-- static DOM hoisting across modules
-- whole-template specialization for arbitrary JSX
-- SSR-oriented compiler output
-- hydration markers or resumability semantics
-- lowering every possible dynamic child shape into a custom fast path
-
-Those may come later, but they are not part of the current stable compiler contract.
-
-## Authoring Guidance
-
-Prefer these patterns when writing Beat views:
-
-- use `Show`, `For`, `Link`, and `Outlet` directly for framework primitives
-- use explicit intrinsic bindings when the update intent is clear
-- keep Pulse values explicit at the edge of the view instead of wrapping them in another reactive abstraction
-- treat JSX as Beat authoring syntax, not as permission to rely on generic rerender behavior
-
-## Regression Coverage
-
-The compiler contract is protected by Beat's Vite plugin tests.
-
-Coverage currently includes:
-
-- explicit intrinsic binding lowering
-- preserving Beat runtime components on the normal JSX path
-- safe single-child text lowering
-- spread-prop preservation
-- non-overreach on mixed-content JSX
+This does not apply when there are multiple children.

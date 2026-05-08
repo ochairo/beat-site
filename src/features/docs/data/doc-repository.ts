@@ -5,6 +5,9 @@ import motivationMd from "./content/motivation/index.md?raw";
 import quickStartMd from "./content/beat/quick-start.md?raw";
 import integrationMd from "./content/beat/integration.md?raw";
 import apiMd from "./content/beat/api.md?raw";
+import compilerMd from "./content/beat/compiler.md?raw";
+import beatUiQuickStartMd from "./content/beat-ui/quick-start.md?raw";
+import beatUiThemingMd from "./content/beat-ui/theming.md?raw";
 import pulseQuickStartMd from "./content/pulse/quick-start.md?raw";
 import pulseIntegrationMd from "./content/pulse/integration.md?raw";
 import pulseApiMd from "./content/pulse/api.md?raw";
@@ -54,6 +57,9 @@ const docs: Record<string, string> = {
   "quick-start": quickStartMd,
   integration: integrationMd,
   api: apiMd,
+  compiler: compilerMd,
+  "beat-ui-quick-start": beatUiQuickStartMd,
+  "beat-ui-theming": beatUiThemingMd,
   "pulse-quick-start": pulseQuickStartMd,
   "pulse-integration": pulseIntegrationMd,
   "pulse-api": pulseApiMd,
@@ -73,6 +79,18 @@ function buildDocSections(): readonly DocSection[] {
         createPage("Quick Start", "quick-start", docs["quick-start"] ?? ""),
         createPage("Integration", "integration", docs["integration"] ?? ""),
         createPage("API", "api", docs["api"] ?? ""),
+        createPage("Compiler", "compiler", docs["compiler"] ?? ""),
+      ],
+    },
+    {
+      title: "Beat UI",
+      pages: [
+        createPage(
+          "Quick Start",
+          "beat-ui-quick-start",
+          docs["beat-ui-quick-start"] ?? "",
+        ),
+        createPage("Theming", "beat-ui-theming", docs["beat-ui-theming"] ?? ""),
       ],
     },
     {

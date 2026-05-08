@@ -23,7 +23,7 @@ export default defineConfig({
 });
 ```
 
-See [Compiler Contract](./compiler.md) for plugin options and lowering rules.
+See [Compiler Contract](./compiler) for plugin options and lowering rules.
 
 ## 3. Configure TypeScript
 
@@ -36,7 +36,7 @@ See [Compiler Contract](./compiler.md) for plugin options and lowering rules.
 }
 ```
 
-See [Compiler Contract](./compiler.md) for the full lowering contract.
+See [Compiler Contract](./compiler) for the full lowering contract.
 
 ## 4. Entry Point
 
@@ -86,6 +86,6 @@ See [API — Server-Side Rendering](./api.md#server-side-rendering) for the full
 
 ## 6. Next Steps
 
-- [Getting Started](./quick-start.md)
-- [API](./API.md)
-- [Compiler Contract](./COMPILER.md)
+- [Getting Started](./quick-start)
+- [API](./api)
+- [Compiler Contract](./compiler)

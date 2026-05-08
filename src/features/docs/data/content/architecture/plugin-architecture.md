@@ -192,4 +192,4 @@ No changes to the library are required. The contract is the extension point.
 - Plugins cannot depend on each other
 - Consumers extend the library by implementing the same contract
 
-For the recommended architecture when building Beat applications rather than libraries, see [Architecture Guide](./clean-architecture.md).
+For the recommended architecture when building Beat applications rather than libraries, see [Architecture Guide](./clean-architecture).

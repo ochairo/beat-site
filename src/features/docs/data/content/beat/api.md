@@ -469,13 +469,12 @@ interface CreateBeatVitePluginOptions {
 Current responsibilities:
 
 - standardize Beat JSX runtime resolution
-- lower Beat control-flow tags from direct and member-expression JSX forms
-- lower explicit intrinsic bindings:
+- lower explicit intrinsic bindings on lowercase DOM tags:
   - `text={...}`
   - `class:name={...}`
   - `style:name={...}`
   - `prop:name={...}`
-- lower safe intrinsic single-child text expressions into Beat's direct text binding path
+- lower single-child text expressions on lowercase DOM tags into Beat's direct text binding path
 
 The Vite plugin is intentionally a separate subpath export rather than part of the main runtime entry.
 

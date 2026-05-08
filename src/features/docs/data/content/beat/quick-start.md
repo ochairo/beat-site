@@ -22,7 +22,7 @@ For the showcases starter:
 pnpm dlx @ochairo/beat-create my-app --template showcases
 ```
 
-If you want to wire Beat into an existing app manually, use [Existing App Setup](./integration.md).
+If you want to wire Beat into an existing app manually, use [Existing App Setup](./integration).
 
 ## 2. Configure TypeScript
 
@@ -37,7 +37,7 @@ Set Beat as the JSX import source.
 }
 ```
 
-See [Compiler Contract](./compiler.md) for the full lowering contract.
+See [Compiler Contract](./compiler) for the full lowering contract.
 
 ## 3. Configure Vite
 
@@ -50,7 +50,7 @@ export default defineConfig({
 });
 ```
 
-See [Compiler Contract](./compiler.md) for plugin options and lowering rules.
+See [Compiler Contract](./compiler) for plugin options and lowering rules.
 
 ## 4. Create A Small App
 
@@ -192,6 +192,6 @@ See [API — Server-Side Rendering](./api.md#server-side-rendering) for the full
 
 After this guide, the most useful references are:
 
-- [API](./API.md)
-- [Compiler Contract](./COMPILER.md)
-- [Existing App Setup](./INTEGRATION.md)
+- [API](./api)
+- [Compiler Contract](./compiler)
+- [Existing App Setup](./integration)

@@ -212,4 +212,4 @@ Components never instantiate repositories or fetch data themselves. This makes t
 
 None of this is mandatory. Use what helps, skip what doesn't.
 
-For the recommended architecture when building domain-specific libraries rather than applications, see [Plugin Architecture](./plugin-architecture.md).
+For the recommended architecture when building domain-specific libraries rather than applications, see [Plugin Architecture](./plugin-architecture).

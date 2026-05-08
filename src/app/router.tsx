@@ -3,9 +3,9 @@ import { createRouter, type BeatRouteDefinition } from "@ochairo/beat";
 import { InMemoryDocRepository } from "../features/docs/data/doc-repository";
 import { DocsPage } from "../features/docs/presentation/DocPage";
 import { InMemoryComponentRepository } from "../features/beat-ui/data/component-repository";
-import { ComponentsPage } from "../features/beat-ui/presentation/Components";
-import { InMemoryPlaygroundRepository } from "../features/playground/data/playground-repository";
-import { PlaygroundPage } from "../features/playground/presentation/PlaygroundPage";
+import { BeatUIPage } from "../features/beat-ui/presentation/BeatUIPage";
+import { InMemoryPlaygroundRepository } from "../features/stackblitz/data/playground-repository";
+import { StackBlitzPage } from "../features/stackblitz/presentation/StackBlitzPage";
 import { InMemoryFeatureRepository } from "../features/home/data/feature-repository";
 import { HomePage } from "../features/home/presentation/Home";
 
@@ -44,12 +44,12 @@ const routes: readonly BeatRouteDefinition[] = [
     redirectTo: "/docs/motivation",
   },
   {
-    path: "/playground",
-    view: () => <PlaygroundPage templates={templates} />,
+    path: "/stackblitz",
+    view: () => <StackBlitzPage templates={templates} />,
   },
   {
-    path: "/components",
-    view: () => <ComponentsPage navGroups={navGroups} showcases={showcases} />,
+    path: "/beat-ui",
+    view: () => <BeatUIPage navGroups={navGroups} showcases={showcases} />,
   },
 ];
 
