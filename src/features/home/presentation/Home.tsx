@@ -165,7 +165,7 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
               npm
             </a>
           </div>
-          <p class={css["footerIntro"]!}>・ Built with Beat ・</p>
+          <p class={css["footerIntro"]!}>Built with Beat</p>
         </footer>
       </div>
     </SiteLayout>
