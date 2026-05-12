@@ -14,6 +14,7 @@ import {
   IconPlus,
   Input,
   MultiSelect,
+  NumberInput,
   Popover,
   SearchInput,
   Select,
@@ -2550,8 +2551,9 @@ export const TaskBoards = component<TaskBoardsProps>((props): BeatJsxChild => {
 
                 <div class={css["field"]!}>
                   <label class={css["fieldLabel"]!}>Points</label>
-                  <Input
-                    type="number"
+                  <NumberInput
+                    id="points"
+                    name="points"
                     value={taskPoints}
                     onValueChange={(value) => taskPoints.set(value)}
                     placeholder="3"
@@ -2580,9 +2582,10 @@ export const TaskBoards = component<TaskBoardsProps>((props): BeatJsxChild => {
                 </div>
 
                 <div class={css["field"]!}>
-                  <label class={css["fieldLabel"]!}>Duration</label>
-                  <Input
-                    type="number"
+                  <label class={css["fieldLabel"]!}>Duration (days)</label>
+                  <NumberInput
+                    id="duration"
+                    name="duration"
                     value={taskDurationDays}
                     onValueChange={(value) => taskDurationDays.set(value)}
                     placeholder="3"

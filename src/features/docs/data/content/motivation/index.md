@@ -37,11 +37,6 @@ function Dashboard({ socket }: { socket: WebSocket }) {
     return () => { socket.onmessage = null; };
   }, [socket]);
 
-  // `memo` prevents MessagesPanel from re-evaluating when `messages` didn't change.
-  // But when `messages` updates, MessagesPanel's entire function body still re-runs.
-  // A new notification arrives — `notifications` updates — Dashboard re-runs from the top.
-  // Without memo, MessagesPanel would re-evaluate on every notification too.
-
   return (
     <div>
       <NotificationBadge count={notifications} />
@@ -77,11 +72,6 @@ function Dashboard({ socket }: { socket: WebSocket }) {
 
   onCleanup(() => { socket.onmessage = null; });
 
-  // This function runs once. That's it.
-  // When `notifications` updates — only NotificationBadge's DOM node changes.
-  // When `messages` updates — only MessagesPanel's bound DOM nodes change.
-  // No component function ever re-runs. No diff. No memo needed.
-
   return (
     <div>
       <NotificationBadge count={notifications} />
@@ -111,14 +101,8 @@ Beat takes a more manual path. Reactivity is never inferred at runtime:
 ```ts
 const state = pulse({ user: { name: "Ada" }, theme: "dark" });
 
-// Just reads the name. No tracking.
-console.log(state.user.name.get());
-
-// Subscribes to the name. Notified when it changes.
+state.user.name.get();
 state.user.name.on((e) => updateLabel(e.currentValue));
-
-// Subscribes to the user object — not its children.
-// Fires when the whole user is replaced, not when a field changes.
 state.user.on((e) => reloadProfile(e.currentValue));
 ```
 
@@ -132,7 +116,6 @@ Most reactive systems track at the **property level** (Vue) or the **signal leve
 
 ```ts
 const state = pulse({ user: { name: "Ada", age: 30 }, theme: "dark" });
-
 state.user.name.on(() => { /* fires when name changes */ });
 state.user.on(() => { /* fires when user is replaced */ });
 ```

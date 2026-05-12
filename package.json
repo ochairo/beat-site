@@ -13,7 +13,7 @@
   "dependencies": {
     "@fontsource-variable/manrope": "^5.2.8",
     "@ochairo/beat": "^1.6.6",
-    "@ochairo/beat-ui": "^1.6.6",
+    "@ochairo/beat-ui": "^1.6.7",
     "@ochairo/numbers": "^1.6.6",
     "@ochairo/pulse": "^1.6.6",
     "esbuild-wasm": "^0.28.0",

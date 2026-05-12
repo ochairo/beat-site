@@ -55,12 +55,6 @@ export const SamplesPage = component<SamplesPageProps>(
     return (
       <SiteLayout contentStyle="display:flex;flex-direction:column;min-height:0;overflow:hidden">
         <div class={css["page"]!}>
-          <div class={css["header"]!}>
-            <h1 class={css["title"]!}>Samples</h1>
-            <p class={css["subtitle"]!}>
-              UI samples built with Beat UI components
-            </p>
-          </div>
           <Tab
             class={css["tab"]!}
             items={items}

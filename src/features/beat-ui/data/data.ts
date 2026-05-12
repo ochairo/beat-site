@@ -219,6 +219,7 @@ return (
     name: "DateInput",
     tag: "molecule",
     category: "Form",
+    height: "350px",
     code: `const date = pulse("");
 
 return (
@@ -236,7 +237,7 @@ return (
     name: "TimeInput",
     tag: "molecule",
     category: "Form",
-    height: "200px",
+    height: "350px",
     code: `const value = pulse("");
 const valueDisabled = pulse("");
 const value24 = pulse("");
@@ -273,6 +274,7 @@ return (
     name: "Select",
     tag: "molecule",
     category: "Form",
+    height: "370px",
     code: `<Select
   id="demo-select"
   canSearch
@@ -284,9 +286,7 @@ return (
     { label: "Vegetables", value: "vegetables", isSelectable: true, children: [
       { label: "Carrot", value: "carrot" },
       { label: "Broccoli", value: "broccoli" },
-    ]},
-    { label: "Meat", value: "meat" },
-  ]}
+    ]},  ]}
   placeholder="Select an option"
 />`,
   },
@@ -295,7 +295,7 @@ return (
     name: "MultiSelect",
     tag: "molecule",
     category: "Form",
-    height: "200px",
+    height: "470px",
     code: `const FOOD_OPTIONS = [
   { label: "Fruits", value: "fruits", children: [
     { label: "Apple", value: "apple" },

@@ -9,7 +9,7 @@ export const PLAYGROUND_TEMPLATES: readonly PlaygroundTemplate[] = [
   },
   {
     key: "ui",
-    label: "UI",
+    label: "Beat UI pre-installed",
     url: "https://stackblitz.com/github/ochairo/beat-create/tree/main/templates/ui?embed=1&file=src/main.tsx&theme=dark",
     title: "Beat UI",
   },
