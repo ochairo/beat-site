@@ -207,6 +207,14 @@
   margin: 0 auto;
 }
 
+.footerIntro {
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--beat-ui-color-text-muted);
+}
+
 .footerLine {
   height: 1px;
   background: linear-gradient(
