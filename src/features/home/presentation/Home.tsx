@@ -46,7 +46,7 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
   });
 
   return (
-    <SiteLayout contentStyle="padding: 0; overflow: hidden">
+    <SiteLayout contentStyle="display:flex;flex-direction:column;min-height:0;padding:0;">
       <div class={css["page"]!}>
         <section class={css["hero"]!}>
           <div class={css["heroLeft"]!}>
@@ -82,7 +82,7 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
           <div class={css["heroRight"]!}>
             <CodeBlock
               code={pulse(
-                `import { component } from '@ochairo/beat'\nimport { render } from '@ochairo/beat/render'\n\nconst App = component(() => (\n  <h1>Hello Beat!</h1>\n  <p>Fast, reactive, no virtual DOM.</p>\n))\nrender(App, document.getElementById('root')!)`,
+                `import { component } from '@ochairo/beat'\nimport { render } from '@ochairo/beat/render'\n\nconst App = component(() => (\n  <h1>Hello Beat!</h1>\n  <h2>Pulse-Native JSX framework</h2>\n  <p>Fast, reactive, no virtual DOM.</p>\n))\nrender(App, document.getElementById('root')!)`,
               )}
               label="TSX"
               copyable={false}
