@@ -25,8 +25,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   {
     label: "Data",
     items: [
+      "Sheet",
       "DatePicker",
-      "DataGrid",
       "Sparkline",
       "BarChart",
       "AreaChart",
@@ -181,7 +181,7 @@ return (
     name: "TextArea",
     tag: "atom",
     category: "Form",
-    height: "160px",
+    height: "120px",
     code: `const value = pulse("");
 
 return (
@@ -219,7 +219,6 @@ return (
     name: "DateInput",
     tag: "molecule",
     category: "Form",
-    height: "420px",
     code: `const date = pulse("");
 
 return (
@@ -237,7 +236,7 @@ return (
     name: "TimeInput",
     tag: "molecule",
     category: "Form",
-    height: "570px",
+    height: "200px",
     code: `const value = pulse("");
 const valueDisabled = pulse("");
 const value24 = pulse("");
@@ -253,28 +252,6 @@ return (
         value={value}
         minuteStep={5}
         onValueChange={(v) => value.set(v)}
-      />
-    </div>
-    <div>
-      <p style="margin:0 0 0.5rem;font-size:0.8rem;">With disabled hours and minutes</p>
-      <TimeInput
-        id="demo-time-disabled"
-        name="demo-time-disabled"
-        value={valueDisabled}
-        minuteStep={15}
-        disabledHours={["00","01","02","03","04","05","06","07","22","23"]}
-        disabledMinutes={["15","45"]}
-        onValueChange={(v) => valueDisabled.set(v)}
-      />
-    </div>
-    <div>
-      <p style="margin:0 0 0.5rem;font-size:0.8rem;">24-hour end of day (00:00 – 24:00)</p>
-      <TimeInput
-        id="demo-time-24"
-        name="demo-time-24"
-        value={value24}
-        minuteStep={30}
-        onValueChange={(v) => value24.set(v)}
       />
     </div>
     <div>
@@ -296,7 +273,6 @@ return (
     name: "Select",
     tag: "molecule",
     category: "Form",
-    height: "400px",
     code: `<Select
   id="demo-select"
   canSearch
@@ -319,7 +295,7 @@ return (
     name: "MultiSelect",
     tag: "molecule",
     category: "Form",
-    height: "480px",
+    height: "200px",
     code: `const FOOD_OPTIONS = [
   { label: "Fruits", value: "fruits", children: [
     { label: "Apple", value: "apple" },
@@ -356,40 +332,6 @@ return (
         value={cascade}
         onValueChange={(v) => cascade.set(v)}
         options={FOOD_OPTIONS}
-        placeholder="Select items"
-      />
-    </div>
-    <div>
-      <p style="margin:0 0 0.5rem;font-size:0.8rem;">Custom: parent selected disables children</p>
-      <MultiSelect
-        id="demo-multiselect-custom"
-        value={pulse([])}
-        onValueChange={() => {}}
-        onParentToggle={(option, current) => {
-          const childValues = (option.children ?? []).map((c) => c.value);
-          const parentSelected = current.includes(option.value);
-          if (parentSelected) {
-            return current.filter(
-              (v) => v !== option.value && !childValues.includes(v),
-            );
-          }
-          return [
-            ...current.filter((v) => !childValues.includes(v)),
-            option.value,
-            ...childValues,
-          ];
-        }}
-        options={[
-          { label: "Fruits", value: "fruits", children: [
-            { label: "Apple", value: "apple" },
-            { label: "Banana", value: "banana" },
-            { label: "Cherry", value: "cherry" },
-          ]},
-          { label: "Vegetables", value: "vegetables", children: [
-            { label: "Carrot", value: "carrot" },
-            { label: "Spinach", value: "spinach" },
-          ]},
-        ]}
         placeholder="Select items"
       />
     </div>
@@ -441,7 +383,7 @@ return (
     name: "Card",
     tag: "atom",
     category: "Layout",
-    height: "200px",
+    height: "140px",
     code: `<div style="display:flex;gap:1rem;flex-wrap:wrap">
   <Card padding="md" radius="md">
     <h3 style="margin:0 0 0.5rem 0;color:var(--beat-ui-color-text)">Default</h3>
@@ -474,11 +416,87 @@ return (
 return <CodeBlock code={code} id="demo-codeblock" label="TSX" editable />`,
   },
   {
+    id: "sheet",
+    name: "Sheet",
+    tag: "organism",
+    category: "Data",
+    height: "450px",
+    code: `const statusOptions = [
+  { label: "Backlog", value: "Backlog" },
+  { label: "Ready", value: "Ready" },
+  { label: "In Progress", value: "In Progress" },
+  { label: "Review", value: "Review" },
+  { label: "Done", value: "Done" },
+];
+
+const trackOptions = [
+  { label: "API", value: "API" },
+  { label: "Growth", value: "Growth" },
+  { label: "Infra", value: "Infra" },
+  { label: "QA", value: "QA" },
+  { label: "UX", value: "UX" },
+];
+
+const owners = ["Aiko", "Maya", "Ren", "Kai"];
+const meetingTimes = ["09:15", "11:00", "14:30"];
+
+const createRow = (index) => {
+  const dueDay = String(12 + (index % 14)).padStart(2, "0");
+
+  return {
+    id: "release-" + (index + 1),
+    initiative: pulse("Release track " + (index + 1)),
+    owner: pulse(owners[index % owners.length]),
+    points: pulse(3 + ((index * 5) % 13)),
+    dueDate: pulse("2026-05-" + dueDay),
+    standup: pulse(meetingTimes[index % meetingTimes.length]),
+    status: pulse(statusOptions[index % statusOptions.length].value),
+    tracks: pulse([trackOptions[index % trackOptions.length].value]),
+    blocked: pulse(index % 5 === 0),
+    notes: pulse(
+      index % 3 === 0
+        ? "Waiting on content sign-off."
+        : "Ready for the next handoff.",
+    ),
+  };
+};
+
+const rows = Array.from({ length: 24 }, (_, index) => createRow(index));
+
+const columns = [
+  { id: "initiative", title: "Initiative", width: "15rem", dataType: "text", getValueState: (row) => row.initiative },
+  { id: "owner", title: "Owner", width: "9rem", dataType: "text", editable: false, getValueState: (row) => row.owner },
+  { id: "points", title: "Pts", width: "7rem", align: "right", dataType: "integer", renderValue: (value) => String(value) + " pts", getValueState: (row) => row.points },
+  { id: "dueDate", title: "Ship Date", width: "9rem", dataType: "date", getValueState: (row) => row.dueDate },
+  { id: "standup", title: "Standup", width: "8rem", dataType: "time", getValueState: (row) => row.standup },
+  { id: "status", title: "Status", width: "10rem", dataType: "select", options: statusOptions, getValueState: (row) => row.status },
+  { id: "tracks", title: "Tracks", width: "12rem", dataType: "multiselect", options: trackOptions, getValueState: (row) => row.tracks },
+  { id: "blocked", title: "Blocked", width: "8rem", dataType: "checkbox", renderValue: (value) => (value === true ? "Yes" : ""), getValueState: (row) => row.blocked },
+  { id: "notes", title: "Notes", width: "20rem", minHeight: "4.5rem", dataType: "textarea", editValueBehavior: "freeze", getValueState: (row) => row.notes },
+];
+
+return (
+  <div style="display:grid;gap:0.75rem;width:100%">
+    <Sheet
+      ariaLabel="Release planning sheet"
+      editValueBehavior="sync-until-dirty"
+      getRowId={(row) => row.id}
+      height="25rem"
+      rowVirtualizationRootMargin="320px 0px 160px 0px"
+      rows={rows}
+      columns={columns}
+      stickyColumnCount={1}
+      virtualizeRows
+    />
+  </div>
+)`,
+  },
+  {
     id: "datepicker",
     name: "DatePicker",
     tag: "molecule",
     category: "Data",
-    height: "380px",
+    height: "350px",
     code: `const selected = pulse("");
 
 return (
@@ -489,38 +507,11 @@ return (
 )`,
   },
   {
-    id: "datagrid",
-    name: "DataGrid",
-    tag: "organism",
-    category: "Data",
-    height: "360px",
-    code: `const columns = [
-  { key: "name", header: "Name", cellType: "text" },
-  { key: "role", header: "Role", cellType: "text" },
-  { key: "hours", header: "Hours", cellType: "number", sortable: true },
-];
-
-const grid = pulse([
-  [{ value: "Ada" }, { value: "Engineer" }, { value: "40" }],
-  [{ value: "Grace" }, { value: "Designer" }, { value: "36" }],
-  [{ value: "Lois" }, { value: "Manager" }, { value: "42" }],
-]);
-
-return (
-  <DataGrid
-    columns={columns}
-    value={grid}
-    showRowHeaders
-    rowCount={5}
-  />
-)`,
-  },
-  {
     id: "sparkline",
     name: "Sparkline",
     tag: "atom",
     category: "Data",
-    height: "280px",
+    height: "250px",
     code: `const values = pulse([4, 7, 2, 8, 5, 9, 3, 6, 8, 4]);
 
 return (
@@ -534,7 +525,7 @@ return (
     name: "BarChart",
     tag: "atom",
     category: "Data",
-    height: "320px",
+    height: "300px",
     code: `const series = pulse([
   { label: "Revenue", values: [42, 58, 35, 70, 55, 80, 62] },
   { label: "Costs",   values: [28, 34, 22, 45, 31, 50, 38] },
@@ -552,7 +543,7 @@ return (
     name: "AreaChart",
     tag: "atom",
     category: "Data",
-    height: "320px",
+    height: "300px",
     code: `const series = pulse([
   { label: "Users",    values: [120, 180, 150, 240, 210, 300, 270] },
   { label: "Sessions", values: [80,  140, 110, 190, 160, 240, 210] },
@@ -570,7 +561,7 @@ return (
     name: "LineChart",
     tag: "atom",
     category: "Data",
-    height: "320px",
+    height: "300px",
     code: `const series = pulse([
   { label: "2024", values: [10, 25, 18, 40, 35, 55, 48], showDots: true },
   { label: "2025", values: [15, 30, 22, 48, 42, 65, 58], showDots: true, dashed: true },
@@ -615,7 +606,7 @@ return (
     name: "ScatterPlot",
     tag: "atom",
     category: "Data",
-    height: "360px",
+    height: "340px",
     code: `const series = pulse([
   {
     label: "Group A",

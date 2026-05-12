@@ -11,9 +11,11 @@
     "bundle:playground": "node scripts/bundle-playground.mjs"
   },
   "dependencies": {
-    "@ochairo/beat": "^1.6.0",
-    "@ochairo/beat-ui": "^1.6.5",
-    "@ochairo/pulse": "^1.6.0",
+    "@fontsource-variable/manrope": "^5.2.8",
+    "@ochairo/beat": "^1.6.6",
+    "@ochairo/beat-ui": "^1.6.6",
+    "@ochairo/numbers": "^1.6.6",
+    "@ochairo/pulse": "^1.6.6",
     "esbuild-wasm": "^0.28.0",
     "highlight.js": "^11.11.1",
     "marked": "^18.0.2",

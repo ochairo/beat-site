@@ -5,7 +5,7 @@ const marked = new Marked();
 const MARKDOWN_STYLE = [
   "line-height:1.7",
   "color:var(--beat-ui-color-text)",
-  "font-family:system-ui,-apple-system,sans-serif",
+  "font-family:var(--beat-ui-font-family-sans,inherit)",
   "max-width:100%",
   "word-wrap:break-word",
 ].join(";");
@@ -46,7 +46,13 @@ const MARKDOWN_CSS = `
     padding: 0.15em 0.4em;
     border-radius: 4px;
     font-size: 0.88em;
-    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+    font-family: var(
+      --beat-ui-font-family-mono,
+      'SF Mono',
+      'Fira Code',
+      'JetBrains Mono',
+      monospace
+    );
   }
 
   .beat-md pre {

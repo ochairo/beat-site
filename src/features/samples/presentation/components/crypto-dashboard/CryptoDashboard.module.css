@@ -1,26 +1,39 @@
 .root {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   gap: 1.5rem;
+  padding-bottom: 1rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Top row: stat cards (left) + BTC chart (right) */
 
 .topRow {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  flex: 0 0 auto;
   gap: 1rem;
   align-items: stretch;
-  min-height: 0;
+  min-width: 0;
 }
 
 /* Stat cards */
 
 .statGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.75rem;
   align-content: start;
+  min-width: 0;
+}
+
+.statGrid > * {
+  min-width: 0;
 }
 
 .statLabel {
@@ -53,57 +66,156 @@
   color: var(--beat-ui-color-text-muted);
 }
 
-/* Table */
-
-.tableWrapper {
-  overflow-x: auto;
+.guideCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
 }
 
-.tableBodyWrapper {
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 320px;
+.guideCopy {
+  min-width: 0;
+  flex: 1 1 24rem;
 }
 
-.table {
+.guideTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--beat-ui-color-text);
+  margin-bottom: 0.35rem;
+}
+
+.guideText {
+  margin: 0;
+  color: var(--beat-ui-color-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.sheetCard {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 24rem;
+  min-height: 24rem;
+  overflow: hidden;
+  background: var(--beat-ui-color-background-elevated);
+}
+
+.sheetArea {
+  display: flex;
+  flex: 1 1 0;
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-  table-layout: fixed;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.th {
-  padding: 0.75rem 1rem;
+.sheet {
+  display: flex;
+  flex: 1 1 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sheetFrame {
+  --beat-ui-sheet-sticky-header-background: var(--beat-ui-color-background);
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.sheetViewport {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--beat-ui-color-background-elevated);
+}
+
+.sheetRoot {
+  width: 100%;
+  min-width: 0;
+  background: var(--beat-ui-color-background-elevated);
+}
+
+.sheetRow {
+  width: 100%;
+  min-width: 0;
+}
+
+.sheetHeader {
+  background: var(--beat-ui-color-background);
+}
+
+.sheetHeaderRow {
+  background: var(--beat-ui-color-background);
+}
+
+.sheetBodyRow {
+  background: var(--beat-ui-color-background-elevated);
+  transition: background 0.1s;
+}
+
+.sheetHeaderCell {
+  --beat-ui-sheet-header-background: var(--beat-ui-color-background);
+  --beat-ui-sheet-header-color: var(--beat-ui-color-text-muted);
+  padding: 0.75rem 0.875rem !important;
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--beat-ui-color-text-muted);
-  border-bottom: 1px solid var(--beat-ui-color-border);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: left;
+  border-right: none !important;
+  border-bottom: 1px solid var(--beat-ui-color-border) !important;
+  background: var(--beat-ui-sheet-header-background);
+}
+
+.sheetStickyHeaderCell {
   background: var(--beat-ui-color-background);
 }
 
-.tr {
-  border-bottom: 1px solid var(--beat-ui-color-border);
-  transition: background 0.1s;
+.sheetCell {
+  --beat-ui-sheet-cell-background: var(--beat-ui-color-background-elevated);
+  --beat-ui-sheet-cell-selected-background: var(
+    --beat-ui-color-background-accent-soft
+  );
+  padding: 0.75rem 0.875rem !important;
+  color: var(--beat-ui-color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  text-align: left;
+  border-right: none !important;
+  border-bottom: 1px solid var(--beat-ui-color-border) !important;
 }
 
-.tr:last-child {
-  border-bottom: none;
-}
-
-.tr:hover {
+.sheetBodyRow:hover
+  .sheetCell:not([data-selected="true"]):not([data-editing="true"]) {
   background: var(--beat-ui-color-background-accent-soft);
 }
 
-.td {
-  padding: 0.75rem 1rem;
-  color: var(--beat-ui-color-text);
-  white-space: nowrap;
-  vertical-align: middle;
-  text-align: left;
+.sheetBodyRow:last-child .sheetCell {
+  border-bottom: none !important;
+}
+
+.sheetCell[data-align="right"],
+.sheetHeaderCell.right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .right {
@@ -120,6 +232,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
+}
+
+.coinName > div {
+  min-width: 0;
 }
 
 .coinInitial {
@@ -140,11 +257,17 @@
   font-weight: 600;
   color: var(--beat-ui-color-text);
   font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .coinSymbol {
   font-size: 0.75rem;
   color: var(--beat-ui-color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .price {
@@ -152,16 +275,37 @@
   font-variant-numeric: tabular-nums;
 }
 
+.deltaBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--beat-ui-color-background-subtle);
+  color: var(--beat-ui-color-text-muted);
+}
+
+.deltaBadgeDefault {
+  background: var(--beat-ui-color-background-subtle);
+  color: var(--beat-ui-color-text-muted);
+}
+
+.deltaBadgeSuccess {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+}
+
+.deltaBadgeDanger {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+}
+
 .muted {
   color: var(--beat-ui-color-text-muted);
   font-variant-numeric: tabular-nums;
-}
-
-.disclaimer {
-  font-size: 0.75rem;
-  color: var(--beat-ui-color-text-muted);
-  text-align: center;
-  margin: 0;
 }
 
 /* ── BTC featured chart ── */
@@ -226,35 +370,6 @@
   min-width: 0;
 }
 
-.btcControls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 0.25rem;
-}
-
-/* ── Controls toolbar ── */
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.toolbarLeft {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbarRight {
-  flex-shrink: 0;
-}
-
 .sliderRow {
   display: flex;
   align-items: center;
@@ -291,23 +406,12 @@
   min-width: 3.5rem;
 }
 
-.ticksBadge {
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--beat-ui-color-text-muted);
-  background: var(--beat-ui-color-background-subtle);
-  border: 1px solid var(--beat-ui-color-border);
-  border-radius: 999px;
-  padding: 0.25rem 0.75rem;
-  white-space: nowrap;
-}
-
 /* ── Price direction colors ── */
 
-.flashUp .price {
+.flashPriceUp {
   color: var(--beat-ui-color-success);
 }
 
-.flashDown .price {
+.flashPriceDown {
   color: var(--beat-ui-color-danger);
 }

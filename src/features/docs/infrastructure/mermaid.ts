@@ -1,5 +1,13 @@
 import mermaid from "mermaid";
 
+function getSansFontFamily(): string {
+  return (
+    getComputedStyle(document.documentElement)
+      .getPropertyValue("--beat-ui-font-family-sans")
+      .trim() || '"Avenir Next", "Segoe UI Variable", "SF Pro Text", sans-serif'
+  );
+}
+
 function isDarkMode(): boolean {
   return (
     document.documentElement.dataset["beatUiMode"] === "dark" ||
@@ -12,7 +20,7 @@ function initMermaid(): void {
   mermaid.initialize({
     startOnLoad: false,
     theme: isDarkMode() ? "dark" : "default",
-    fontFamily: "system-ui, -apple-system, sans-serif",
+    fontFamily: getSansFontFamily(),
   });
 }
 

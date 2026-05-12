@@ -2,7 +2,20 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
   gap: 1.5rem;
+}
+
+.page > .tab {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 .header {
@@ -24,7 +37,29 @@
   margin: 0;
 }
 
-.page :global([data-part="panel"]) {
-  max-height: 71vh;
-  overflow-y: auto;
+.tab > :global([data-part="tab-list"]) {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.tab > :global([data-part="panel"]) {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tab > :global([data-part="panel"]) > :global([role="tabpanel"][hidden]) {
+  display: none;
+}
+
+.tab > :global([data-part="panel"]) > :global([role="tabpanel"]:not([hidden])) {
+  display: flex;
+  flex: 1 1 auto;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
 }

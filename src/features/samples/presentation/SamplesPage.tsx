@@ -3,7 +3,7 @@ import { Tab } from "@ochairo/beat-ui";
 import { pulse } from "@ochairo/pulse";
 
 import { SiteLayout } from "../../../shared/layout/Layout";
-import type { TaskBoardPort, CryptoDashboardPort } from "../domain/ports";
+import type { CryptoDashboardPort, TaskBoardPort } from "../domain/ports";
 import type { CoinMeta, TaskBoardData } from "../domain/types";
 import { CryptoDashboard } from "./components/crypto-dashboard/CryptoDashboard";
 import { TaskBoards } from "./components/task-boards/TaskBoards";
@@ -16,13 +16,16 @@ export interface SamplesPageProps {
 
 const SAMPLE_TABS = [
   { key: "crypto-dashboard" as const, label: "Crypto Dashboard" },
-  { key: "task-boards" as const, label: "Task Boards" },
+  { key: "task-boards" as const, label: "Task Boards / Gantt Chart" },
 ];
+
+const DEFAULT_SAMPLE_TAB = SAMPLE_TABS[0]?.key ?? "crypto-dashboard";
 
 export const SamplesPage = component<SamplesPageProps>(
   (props): BeatJsxChild => {
     const taskBoardData = pulse<TaskBoardData | null>(null);
     const coins = pulse<readonly CoinMeta[] | null>(null);
+    const activeSample = pulse<string>(DEFAULT_SAMPLE_TAB);
 
     onMount(() => {
       void Promise.all([
@@ -37,7 +40,7 @@ export const SamplesPage = component<SamplesPageProps>(
     const items = SAMPLE_TABS.map((tab) => ({
       key: tab.key,
       label: tab.label,
-      content:
+      renderContent: () =>
         tab.key === "crypto-dashboard" ? (
           <Show when={coins} mapValue={(v) => v !== null}>
             {() => <CryptoDashboard coins={coins.get()!} />}
@@ -50,7 +53,7 @@ export const SamplesPage = component<SamplesPageProps>(
     }));
 
     return (
-      <SiteLayout>
+      <SiteLayout contentStyle="display:flex;flex-direction:column;min-height:0;overflow:hidden">
         <div class={css["page"]!}>
           <div class={css["header"]!}>
             <h1 class={css["title"]!}>Samples</h1>
@@ -58,7 +61,12 @@ export const SamplesPage = component<SamplesPageProps>(
               UI samples built with Beat UI components
             </p>
           </div>
-          <Tab items={items} />
+          <Tab
+            class={css["tab"]!}
+            items={items}
+            value={activeSample}
+            onValueChange={(nextValue) => activeSample.set(nextValue)}
+          />
         </div>
       </SiteLayout>
     );

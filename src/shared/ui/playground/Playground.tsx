@@ -16,14 +16,15 @@ let playgroundCounter = 0;
 
 function getThemeCss(): string {
   const el = document.documentElement;
+  const computed = getComputedStyle(el);
   const vars: string[] = [];
-  for (let i = 0; i < el.style.length; i++) {
-    const prop = el.style.item(i);
+  for (let i = 0; i < computed.length; i++) {
+    const prop = computed.item(i);
     if (prop.startsWith("--beat-ui")) {
-      vars.push(`${prop}:${el.style.getPropertyValue(prop)}`);
+      vars.push(`${prop}:${computed.getPropertyValue(prop)}`);
     }
   }
-  const colorScheme = el.style.colorScheme || "dark";
+  const colorScheme = el.style.colorScheme || computed.colorScheme || "dark";
   return `:root{${vars.join(";")};color-scheme:${colorScheme}}`;
 }
 
@@ -98,7 +99,7 @@ function buildSrcdoc(
     themeCss,
     beatUiCss,
     `*{margin:0;padding:0;box-sizing:border-box}`,
-    `body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;`,
+    `body{font-family:var(--beat-ui-font-family-sans,sans-serif);`,
     `background:transparent;padding:0.75rem;min-height:${height};`,
     `color:var(--beat-ui-color-text-muted);`,
     `display:flex;flex-wrap:wrap;align-items:flex-start;gap:0.75rem}`,

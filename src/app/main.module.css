@@ -1,11 +1,14 @@
+:global(:root) {
+  --beat-ui-font-family-sans:
+    "Manrope Variable", "Avenir Next", "Segoe UI Variable", "SF Pro Text",
+    sans-serif;
+  --beat-ui-font-family-mono:
+    "SF Mono", SFMono-Regular, ui-monospace, Menlo, monospace;
+}
+
 .root {
   margin: 0;
   padding: 0;
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  font-family: var(--beat-ui-font-family-sans);
   color: var(--beat-ui-color-text);
 }

@@ -1,4 +1,4 @@
-import type { CoinMeta, TaskBoardData } from "./types";
+import type { CoinMeta, SyncSheetSnapshot, TaskBoardData } from "./types";
 
 export interface TaskBoardPort {
   getTaskBoardData(): Promise<TaskBoardData>;
@@ -6,4 +6,8 @@ export interface TaskBoardPort {
 
 export interface CryptoDashboardPort {
   getCoins(): Promise<readonly CoinMeta[]>;
+}
+
+export interface SyncSheetPort {
+  getSyncSheetSnapshot(): Promise<SyncSheetSnapshot>;
 }

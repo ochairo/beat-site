@@ -1,5 +1,6 @@
 import { Outlet, render } from "@ochairo/beat";
 import { ThemeRoot } from "@ochairo/beat-ui";
+import "@fontsource-variable/manrope/wght.css";
 import "@ochairo/beat-ui/style.css";
 
 import { router } from "./router";

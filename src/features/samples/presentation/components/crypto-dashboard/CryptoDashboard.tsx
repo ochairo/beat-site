@@ -1,14 +1,17 @@
 import { component, onCleanup, type BeatJsxChild } from "@ochairo/beat";
+import { Decimal, Int } from "@ochairo/numbers";
 import {
-  Badge,
   Button,
   Card,
   IconPause,
   IconPlay,
+  Sheet,
   Slider,
   Sparkline,
+  type BeatUiState,
+  type SheetColumnDefinition,
 } from "@ochairo/beat-ui";
-import { derived, pulse } from "@ochairo/pulse";
+import { derived, pulse, type ReadonlyPulse } from "@ochairo/pulse";
 
 import type { CoinMeta } from "../../../domain/types";
 import css from "./CryptoDashboard.module.css";
@@ -25,11 +28,6 @@ function fmt(price: number): string {
   if (price >= 1)
     return `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   return `$${price.toLocaleString("en-US", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`;
-}
-
-function fmtChange(pct: number): string {
-  const sign = pct >= 0 ? "+" : "";
-  return `${sign}${(pct * 100).toFixed(2)}%`;
 }
 
 function tone(pct: number): "success" | "danger" | "default" {
@@ -52,9 +50,22 @@ function fmtSupply(value: number, symbol: string): string {
   return `${value.toFixed(0)} ${symbol}`;
 }
 
-function fmtPctFromATH(price: number, ath: number): string {
-  const pct = ((price - ath) / ath) * 100;
-  return `${pct.toFixed(1)}%`;
+function fmtPercentValue(value: number, fractionDigits = 2): string {
+  return `${value.toFixed(fractionDigits)}%`;
+}
+
+function fmtSignedPercentValue(value: number, fractionDigits = 2): string {
+  const prefix = value > 0 ? "+" : "";
+  return `${prefix}${value.toFixed(fractionDigits)}%`;
+}
+
+function toNumber(value: unknown): number {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  const normalized = Number(String(value));
+  return Number.isFinite(normalized) ? normalized : 0;
 }
 
 // ── BTC chart builder ──
@@ -72,6 +83,8 @@ interface BtcPaths {
   minLabel: string;
   currentLabel: string;
 }
+
+type FlashDirection = "" | "up" | "down";
 
 function buildBtcPaths(values: readonly number[], ath: number): BtcPaths {
   if (values.length < 2) {
@@ -119,40 +132,596 @@ function buildBtcPaths(values: readonly number[], ath: number): BtcPaths {
 
 // ── Reactive coin state ──
 
-interface CoinState {
-  meta: CoinMeta;
-  supply: number;
-  ath: number;
-  price: ReturnType<typeof pulse<number>>;
-  history: ReturnType<typeof pulse<readonly number[]>>;
-  change1h: ReturnType<typeof pulse<number>>;
-  change24h: ReturnType<typeof pulse<number>>;
-  change7d: ReturnType<typeof pulse<number>>;
-  flashClass: ReturnType<typeof pulse<string>>;
-  volume: ReturnType<typeof pulse<number>>;
+interface CoinPulseState {
+  readonly rank: unknown;
+  readonly name: string;
+  readonly symbol: string;
+  readonly supply: unknown;
+  readonly ath: unknown;
+  readonly price: unknown;
+  readonly history: string;
+  readonly historyPoints: readonly number[];
+  readonly change1h: unknown;
+  readonly change24h: unknown;
+  readonly change7d: unknown;
+  readonly change30d: unknown;
+  readonly flashClass: FlashDirection;
+  readonly volume: unknown;
+  readonly marketCap: unknown;
+  readonly volMcap: unknown;
+  readonly pctFromATH: unknown;
 }
 
-function makeCoinState(meta: CoinMeta): CoinState {
+interface CoinState {
+  meta: CoinMeta;
+  rank: BeatUiState<unknown>;
+  name: BeatUiState<string>;
+  symbol: BeatUiState<string>;
+  supply: BeatUiState<unknown>;
+  ath: BeatUiState<unknown>;
+  price: BeatUiState<unknown>;
+  history: BeatUiState<string>;
+  historyPoints: BeatUiState<readonly number[]>;
+  change1h: BeatUiState<unknown>;
+  change24h: BeatUiState<unknown>;
+  change7d: BeatUiState<unknown>;
+  change30d: BeatUiState<unknown>;
+  flashClass: BeatUiState<FlashDirection>;
+  volume: BeatUiState<unknown>;
+  marketCap: BeatUiState<unknown>;
+  volMcap: BeatUiState<unknown>;
+  pctFromATH: BeatUiState<unknown>;
+  sparklineColor: ReadonlyPulse<string>;
+  beginBatchedUpdate: () => void;
+  endBatchedUpdate: () => void;
+  applySimulationTick: () => void;
+}
+
+function createIntegerValue(value: number): unknown {
+  return Int(String(Math.round(value)));
+}
+
+function roundNumber(value: number, fractionDigits: number): number {
+  return Number(value.toFixed(fractionDigits));
+}
+
+function createDecimalValue(value: number, fractionDigits: number): unknown {
+  return Decimal(value.toFixed(fractionDigits));
+}
+
+function setDecimalState(
+  state: BeatUiState<unknown>,
+  value: number,
+  fractionDigits: number,
+): void {
+  state.set(roundNumber(value, fractionDigits));
+}
+
+function formatHistorySeries(values: readonly number[]): string {
+  return values.join(",");
+}
+
+function parseHistorySeries(value: string): readonly number[] {
+  return value
+    .split(/[\s,]+/)
+    .map((part) => Number(part))
+    .filter((part) => Number.isFinite(part));
+}
+
+function advanceHistorySeries(
+  values: readonly number[],
+  nextValue: number,
+): readonly number[] {
+  const length = values.length;
+  if (length === 0) {
+    return [nextValue];
+  }
+
+  const nextValues = new Array<number>(length);
+  for (let index = 1; index < length; index += 1) {
+    nextValues[index - 1] = values[index] ?? nextValue;
+  }
+  nextValues[length - 1] = nextValue;
+  return nextValues;
+}
+
+function createInitialCoinPulseState(meta: CoinMeta): CoinPulseState {
   const initialHistory = Array.from({ length: 20 }, (_, i) =>
     jitter(meta.basePrice, 0.04 * ((20 - i) / 20)),
   );
-  // Rough market-cap estimate via power-law decay; used for supply + volume seed
   const roughMcap = 1.5e12 / Math.pow(meta.rank, 1.3);
-  const supply = roughMcap / meta.basePrice;
-  const ath = meta.basePrice * Math.min(1.1 + meta.rank * 0.12, 25);
+  const initialAth = meta.basePrice * Math.min(1.1 + meta.rank * 0.12, 25);
+  const initialChange1h = (Math.random() - 0.5) * 0.6;
+  const initialChange24h = (Math.random() - 0.5) * 4;
+  const initialChange7d = (Math.random() - 0.5) * 10;
+  const initialChange30d = (Math.random() - 0.5) * 18;
+  const initialVolume = roughMcap * (0.05 + Math.random() * 0.15);
+
   return {
-    meta,
-    supply,
-    ath,
-    price: pulse(meta.basePrice),
-    history: pulse<readonly number[]>(initialHistory),
-    change1h: pulse((Math.random() - 0.5) * 0.006),
-    change24h: pulse((Math.random() - 0.5) * 0.04),
-    change7d: pulse((Math.random() - 0.5) * 0.1),
-    flashClass: pulse(""),
-    volume: pulse(roughMcap * (0.05 + Math.random() * 0.15)),
+    rank: createIntegerValue(meta.rank),
+    name: meta.name,
+    symbol: meta.symbol,
+    supply: createIntegerValue(roughMcap / meta.basePrice),
+    ath: createDecimalValue(initialAth, 4),
+    price: roundNumber(meta.basePrice, 4),
+    history: formatHistorySeries(initialHistory),
+    historyPoints: initialHistory,
+    change1h: roundNumber(initialChange1h, 2),
+    change24h: roundNumber(initialChange24h, 2),
+    change7d: roundNumber(initialChange7d, 2),
+    change30d: roundNumber(initialChange30d, 2),
+    flashClass: "",
+    volume: Math.round(initialVolume),
+    marketCap: roundNumber(roughMcap, 2),
+    volMcap: roundNumber((initialVolume / roughMcap) * 100, 2),
+    pctFromATH: roundNumber(
+      ((meta.basePrice - initialAth) / initialAth) * 100,
+      1,
+    ),
   };
 }
+
+function makeCoinState(
+  meta: CoinMeta,
+  state: BeatUiState<CoinPulseState>,
+  batch: <T>(callback: () => T) => T,
+): CoinState {
+  const rank: BeatUiState<unknown> = state.rank;
+  const name: BeatUiState<string> = state.name;
+  const symbol: BeatUiState<string> = state.symbol;
+  const supply: BeatUiState<unknown> = state.supply;
+  const ath: BeatUiState<unknown> = state.ath;
+  const price: BeatUiState<unknown> = state.price;
+  const history: BeatUiState<string> = state.history;
+  const historyPoints: BeatUiState<readonly number[]> = state.historyPoints;
+  const change1h: BeatUiState<unknown> = state.change1h;
+  const change24h: BeatUiState<unknown> = state.change24h;
+  const change7d: BeatUiState<unknown> = state.change7d;
+  const change30d: BeatUiState<unknown> = state.change30d;
+  const flashClass: BeatUiState<FlashDirection> = state.flashClass;
+  const volume: BeatUiState<unknown> = state.volume;
+  const marketCap: BeatUiState<unknown> = state.marketCap;
+  const volMcap: BeatUiState<unknown> = state.volMcap;
+  const pctFromATH: BeatUiState<unknown> = state.pctFromATH;
+  const sparklineColor = derived(change7d, resolveSparklineColor);
+  const coin: Omit<
+    CoinState,
+    "beginBatchedUpdate" | "endBatchedUpdate" | "applySimulationTick"
+  > = {
+    meta,
+    rank,
+    name,
+    symbol,
+    supply,
+    ath,
+    price,
+    history,
+    historyPoints,
+    change1h,
+    change24h,
+    change7d,
+    change30d,
+    flashClass,
+    volume,
+    marketCap,
+    volMcap,
+    pctFromATH,
+    sparklineColor,
+  };
+
+  let marketCapIsDerived = true;
+  let volMcapIsDerived = true;
+  let pctFromATHIsDerived = true;
+  let batchingTickUpdate = false;
+  let syncingDerivedState = false;
+  let syncingHistoryState = false;
+
+  const syncDerivedFields = (nextPrice: number, nextVolume: number): void => {
+    const nextAth = toNumber(ath.get());
+    const nextSupply = toNumber(supply.get());
+    const nextComputedMarketCap = nextPrice * nextSupply;
+    const marketCapBasis = marketCapIsDerived
+      ? nextComputedMarketCap
+      : toNumber(marketCap.get());
+
+    if (marketCapIsDerived) {
+      setDecimalState(marketCap, nextComputedMarketCap, 2);
+    }
+
+    if (volMcapIsDerived) {
+      setDecimalState(
+        volMcap,
+        marketCapBasis === 0 ? 0 : (nextVolume / marketCapBasis) * 100,
+        2,
+      );
+    }
+
+    if (pctFromATHIsDerived) {
+      setDecimalState(
+        pctFromATH,
+        nextAth === 0 ? 0 : ((nextPrice - nextAth) / nextAth) * 100,
+        1,
+      );
+    }
+  };
+
+  const recompute = (): void => {
+    syncingDerivedState = true;
+    try {
+      batch(() => {
+        syncDerivedFields(toNumber(price.get()), toNumber(volume.get()));
+      });
+    } finally {
+      syncingDerivedState = false;
+    }
+  };
+
+  const syncHistoryPoints = (): void => {
+    if (syncingHistoryState) {
+      return;
+    }
+
+    historyPoints.set(parseHistorySeries(String(history.get())));
+  };
+
+  const requestRecompute = (): void => {
+    if (batchingTickUpdate) {
+      return;
+    }
+
+    recompute();
+  };
+
+  const beginBatchedUpdate = (): void => {
+    batchingTickUpdate = true;
+    syncingDerivedState = true;
+    syncingHistoryState = true;
+  };
+
+  const endBatchedUpdate = (): void => {
+    syncingHistoryState = false;
+    syncingDerivedState = false;
+    batchingTickUpdate = false;
+  };
+
+  const applySimulationTick = (): void => {
+    const current = state.get();
+    const previousPrice = toNumber(current.price);
+    const nextPrice = jitter(previousPrice, 0.004);
+    const nextHistory = advanceHistorySeries(current.historyPoints, nextPrice);
+    const nextChange1h =
+      toNumber(current.change1h) + (Math.random() - 0.5) * 0.04;
+    const nextChange24h =
+      toNumber(current.change24h) + (Math.random() - 0.5) * 0.1;
+    const nextChange7d =
+      toNumber(current.change7d) + (Math.random() - 0.5) * 0.05;
+    const nextChange30d =
+      toNumber(current.change30d) + (Math.random() - 0.5) * 0.15;
+    const nextFlashClass: FlashDirection =
+      nextPrice >= previousPrice ? "up" : "down";
+    const nextVolume = jitter(toNumber(current.volume), 0.02);
+    const nextAth = toNumber(current.ath);
+    const nextSupply = toNumber(current.supply);
+    const nextComputedMarketCap = nextPrice * nextSupply;
+    const marketCapBasis = marketCapIsDerived
+      ? nextComputedMarketCap
+      : toNumber(current.marketCap);
+
+    state.set({
+      ...current,
+      price: roundNumber(nextPrice, 4),
+      history: formatHistorySeries(nextHistory),
+      historyPoints: nextHistory,
+      change1h: roundNumber(nextChange1h, 2),
+      change24h: roundNumber(nextChange24h, 2),
+      change7d: roundNumber(nextChange7d, 2),
+      change30d: roundNumber(nextChange30d, 2),
+      flashClass: nextFlashClass,
+      volume: Math.round(nextVolume),
+      marketCap: marketCapIsDerived
+        ? roundNumber(nextComputedMarketCap, 2)
+        : current.marketCap,
+      volMcap: volMcapIsDerived
+        ? roundNumber(
+            marketCapBasis === 0 ? 0 : (nextVolume / marketCapBasis) * 100,
+            2,
+          )
+        : current.volMcap,
+      pctFromATH: pctFromATHIsDerived
+        ? roundNumber(
+            nextAth === 0 ? 0 : ((nextPrice - nextAth) / nextAth) * 100,
+            1,
+          )
+        : current.pctFromATH,
+    });
+  };
+
+  const disposers = [
+    price.on(requestRecompute),
+    supply.on(requestRecompute),
+    volume.on(requestRecompute),
+    ath.on(requestRecompute),
+    history.on(syncHistoryPoints),
+    marketCap.on(() => {
+      if (!syncingDerivedState) {
+        marketCapIsDerived = false;
+      }
+    }),
+    volMcap.on(() => {
+      if (!syncingDerivedState) {
+        volMcapIsDerived = false;
+      }
+    }),
+    pctFromATH.on(() => {
+      if (!syncingDerivedState) {
+        pctFromATHIsDerived = false;
+      }
+    }),
+  ];
+
+  onCleanup(() => {
+    for (const dispose of disposers) {
+      dispose();
+    }
+  });
+
+  recompute();
+
+  return {
+    ...coin,
+    beginBatchedUpdate,
+    endBatchedUpdate,
+    applySimulationTick,
+  };
+}
+
+function renderCoinAsset(row: CoinState): BeatJsxChild {
+  return (
+    <div class={css["coinName"]!}>
+      <div class={css["coinInitial"]!}>{row.symbol.get()[0]}</div>
+      <div>
+        <div class={css["coinTitle"]!} text={row.name} />
+        <div class={css["coinSymbol"]!} text={row.symbol} />
+      </div>
+    </div>
+  );
+}
+
+type CryptoTableColumnId =
+  | "rank"
+  | "asset"
+  | "price"
+  | "change1h"
+  | "change24h"
+  | "change7d"
+  | "change30d"
+  | "marketCap"
+  | "volume24h"
+  | "volMcap"
+  | "supply"
+  | "ath"
+  | "pctFromATH"
+  | "history";
+
+function isRightAlignedColumnId(columnId: CryptoTableColumnId): boolean {
+  return columnId !== "rank" && columnId !== "asset";
+}
+
+type DeltaTone = ReturnType<typeof tone>;
+
+const DELTA_BADGE_SUCCESS_CLASS = `${css["deltaBadge"]!} ${css["deltaBadgeSuccess"]!}`;
+const DELTA_BADGE_DANGER_CLASS = `${css["deltaBadge"]!} ${css["deltaBadgeDanger"]!}`;
+const DELTA_BADGE_DEFAULT_CLASS = `${css["deltaBadge"]!} ${css["deltaBadgeDefault"]!}`;
+const PRICE_BASE_CLASS = css["price"]!;
+const PRICE_UP_CLASS = `${css["price"]!} ${css["flashPriceUp"]!}`;
+const PRICE_DOWN_CLASS = `${css["price"]!} ${css["flashPriceDown"]!}`;
+
+function resolveDeltaBadgeClass(toneValue: DeltaTone): string {
+  switch (toneValue) {
+    case "success":
+      return DELTA_BADGE_SUCCESS_CLASS;
+    case "danger":
+      return DELTA_BADGE_DANGER_CLASS;
+    default:
+      return DELTA_BADGE_DEFAULT_CLASS;
+  }
+}
+
+function resolvePriceClass(flashClass: FlashDirection): string {
+  if (flashClass === "up") {
+    return PRICE_UP_CLASS;
+  }
+
+  if (flashClass === "down") {
+    return PRICE_DOWN_CLASS;
+  }
+
+  return PRICE_BASE_CLASS;
+}
+
+function resolveSparklineColor(change: unknown): string {
+  return toNumber(change) >= 0
+    ? "var(--beat-ui-color-success)"
+    : "var(--beat-ui-color-danger)";
+}
+
+function renderDeltaBadge(value: unknown): BeatJsxChild {
+  const numericValue = toNumber(value);
+
+  return (
+    <span class={resolveDeltaBadgeClass(tone(numericValue))}>
+      <span>{fmtSignedPercentValue(numericValue)}</span>
+    </span>
+  );
+}
+
+const CRYPTO_TABLE_COLUMNS: readonly SheetColumnDefinition<CoinState>[] = [
+  {
+    id: "rank",
+    title: "#",
+    width: "3%",
+    align: "right",
+    dataType: "integer",
+    editable: true,
+    getValueState: (row) => row.rank,
+    renderValue: (value) => <span class={css["rank"]!}>{toNumber(value)}</span>,
+  },
+  {
+    id: "asset",
+    title: "Name",
+    width: "15%",
+    dataType: "text",
+    editable: true,
+    getValueState: (row) => row.name as BeatUiState<unknown>,
+    renderValue: (_value, row) => renderCoinAsset(row),
+  },
+  {
+    id: "price",
+    title: "Price",
+    width: "8%",
+    align: "right",
+    dataType: "decimal(18,4)",
+    editable: true,
+    getValueState: (row) => row.price,
+    renderValue: (value, row) => (
+      <span class={resolvePriceClass(row.flashClass.get())}>
+        {fmt(toNumber(value))}
+      </span>
+    ),
+  },
+  {
+    id: "change1h",
+    title: "1h %",
+    width: "5%",
+    align: "right",
+    dataType: "decimal(8,2)",
+    editable: true,
+    getValueState: (row) => row.change1h,
+    renderValue: (value) => renderDeltaBadge(value),
+  },
+  {
+    id: "change24h",
+    title: "24h %",
+    width: "5%",
+    align: "right",
+    dataType: "decimal(8,2)",
+    editable: true,
+    getValueState: (row) => row.change24h,
+    renderValue: (value) => renderDeltaBadge(value),
+  },
+  {
+    id: "change7d",
+    title: "7d %",
+    width: "5%",
+    align: "right",
+    dataType: "decimal(8,2)",
+    editable: true,
+    getValueState: (row) => row.change7d,
+    renderValue: (value) => renderDeltaBadge(value),
+  },
+  {
+    id: "change30d",
+    title: "30d %",
+    width: "5%",
+    align: "right",
+    dataType: "decimal(8,2)",
+    editable: true,
+    getValueState: (row) => row.change30d,
+    renderValue: (value) => renderDeltaBadge(value),
+  },
+  {
+    id: "marketCap",
+    title: "Market Cap",
+    width: "8%",
+    align: "right",
+    dataType: "decimal(18,2)",
+    editable: true,
+    getValueState: (row) => row.marketCap,
+    renderValue: (value) => (
+      <span class={css["price"]!}>{fmtCompact(toNumber(value))}</span>
+    ),
+  },
+  {
+    id: "volume24h",
+    title: "Volume (24h)",
+    width: "8%",
+    align: "right",
+    dataType: "integer",
+    editable: true,
+    getValueState: (row) => row.volume,
+    renderValue: (value) => (
+      <span class={css["muted"]!}>{fmtCompact(toNumber(value))}</span>
+    ),
+  },
+  {
+    id: "volMcap",
+    title: "Vol/MCap",
+    width: "6%",
+    align: "right",
+    dataType: "decimal(8,2)",
+    editable: true,
+    getValueState: (row) => row.volMcap,
+    renderValue: (value) => (
+      <span class={css["muted"]!}>{fmtPercentValue(toNumber(value))}</span>
+    ),
+  },
+  {
+    id: "supply",
+    title: "Circ. Supply",
+    width: "10%",
+    align: "right",
+    dataType: "integer",
+    editable: true,
+    getValueState: (row) => row.supply,
+    renderValue: (value, row) => (
+      <span class={css["muted"]!}>
+        {fmtSupply(toNumber(value), row.meta.symbol)}
+      </span>
+    ),
+  },
+  {
+    id: "ath",
+    title: "ATH",
+    width: "8%",
+    align: "right",
+    dataType: "decimal(18,4)",
+    editable: true,
+    getValueState: (row) => row.ath,
+    renderValue: (value) => (
+      <span class={css["muted"]!}>{fmt(toNumber(value))}</span>
+    ),
+  },
+  {
+    id: "pctFromATH",
+    title: "% from ATH",
+    width: "6%",
+    align: "right",
+    dataType: "decimal(8,1)",
+    editable: true,
+    getValueState: (row) => row.pctFromATH,
+    renderValue: (value) => (
+      <span class={`${css["deltaBadge"]!} ${css["deltaBadgeDanger"]!}`}>
+        <span>{fmtPercentValue(toNumber(value), 1)}</span>
+      </span>
+    ),
+  },
+  {
+    id: "history",
+    title: "Last 7 Days",
+    width: "8%",
+    align: "right",
+    dataType: "text",
+    editable: true,
+    getValueState: (row) => row.history as BeatUiState<unknown>,
+    renderValue: (_value, row) => (
+      <Sparkline
+        values={row.historyPoints}
+        height={32}
+        stroke={row.sparklineColor}
+      />
+    ),
+  },
+];
 
 // ── Component ──
 
@@ -162,7 +731,19 @@ export interface CryptoDashboardProps {
 
 export const CryptoDashboard = component<CryptoDashboardProps>(
   (props): BeatJsxChild => {
-    const coins = props.coins.map(makeCoinState);
+    const coinStore = pulse<Record<string, CoinPulseState>>(
+      Object.fromEntries(
+        props.coins.map((meta) => [
+          meta.symbol,
+          createInitialCoinPulseState(meta),
+        ]),
+      ),
+    );
+    const coins = props.coins.map((meta) =>
+      makeCoinState(meta, coinStore.prop(meta.symbol), (callback) =>
+        coinStore.batch(callback),
+      ),
+    );
 
     // ── BTC featured chart ──
     const btc = coins[0]!;
@@ -179,7 +760,7 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
     onCleanup(
       btc.flashClass.on(({ currentValue }) => {
         btcChartColor.set(
-          currentValue === css["flashUp"]!
+          currentValue === "up"
             ? "var(--beat-ui-color-success)"
             : "var(--beat-ui-color-danger)",
         );
@@ -190,9 +771,6 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
     const volume24h = pulse(133.7e9);
     const fearGreed = pulse(47);
     const btcDominance = pulse(60.2);
-    const ethDominance = pulse(9.8);
-    const defiCap = pulse(118e9);
-    const stablecoinMcap = pulse(212e9);
     const derivativesVol = pulse(87e9);
     const totalExchanges = pulse(642);
 
@@ -212,23 +790,24 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
       ticksPerSec.set(tickTimestamps.length);
 
       for (const coin of coins) {
-        const prev = coin.price.get();
-        const next = jitter(prev, 0.004);
-        const fc = next >= prev ? css["flashUp"]! : css["flashDown"]!;
-        coin.price.set(next);
-        coin.history.set([...coin.history.get().slice(1), next]);
-        coin.change1h.set(coin.change1h.get() + (Math.random() - 0.5) * 0.0004);
-        coin.change24h.set(
-          coin.change24h.get() + (Math.random() - 0.5) * 0.001,
-        );
-        coin.change7d.set(coin.change7d.get() + (Math.random() - 0.5) * 0.0005);
-        coin.flashClass.set(fc);
-        coin.volume.set(jitter(coin.volume.get(), 0.02));
+        coin.beginBatchedUpdate();
+      }
+
+      try {
+        coinStore.batch(() => {
+          for (const coin of coins) {
+            coin.applySimulationTick();
+          }
+        });
+      } finally {
+        for (const coin of coins) {
+          coin.endBatchedUpdate();
+        }
       }
 
       btcChartHistory.set([
         ...btcChartHistory.get().slice(1),
-        coins[0]!.price.get(),
+        toNumber(btc.price.get()),
       ]);
 
       marketCap.set(jitter(marketCap.get(), 0.002));
@@ -242,14 +821,6 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
           Math.max(0, btcDominance.get() + (Math.random() - 0.5) * 0.02),
         ),
       );
-      ethDominance.set(
-        Math.min(
-          100,
-          Math.max(0, ethDominance.get() + (Math.random() - 0.5) * 0.01),
-        ),
-      );
-      defiCap.set(jitter(defiCap.get(), 0.003));
-      stablecoinMcap.set(jitter(stablecoinMcap.get(), 0.001));
       derivativesVol.set(jitter(derivativesVol.get(), 0.008));
       totalExchanges.set(
         Math.max(
@@ -307,9 +878,6 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
     );
     const fearGreedDisplay = derived(fearGreed, (v) => `${Math.round(v)}`);
     const btcDomDisplay = derived(btcDominance, (v) => `${v.toFixed(1)}%`);
-    const ethDomDisplay = derived(ethDominance, (v) => `${v.toFixed(1)}%`);
-    const defiCapDisplay = derived(defiCap, (v) => fmtCompact(v));
-    const stablecoinDisplay = derived(stablecoinMcap, (v) => fmtCompact(v));
     const derivativesDisplay = derived(derivativesVol, (v) => fmtCompact(v));
     const exchangesDisplay = derived(totalExchanges, (v) => String(v));
 
@@ -318,9 +886,6 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
     const volDir = pulse("");
     const fgDir = pulse("");
     const btcDir = pulse("");
-    const ethDir = pulse("");
-    const defiDir = pulse("");
-    const stableDir = pulse("");
     const derivDir = pulse("");
     const exchDir = pulse("");
     onCleanup(
@@ -352,27 +917,6 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
       }),
     );
     onCleanup(
-      ethDominance.on(({ previousValue, currentValue }) => {
-        ethDir.set(
-          currentValue >= previousValue ? css["statUp"]! : css["statDown"]!,
-        );
-      }),
-    );
-    onCleanup(
-      defiCap.on(({ previousValue, currentValue }) => {
-        defiDir.set(
-          currentValue >= previousValue ? css["statUp"]! : css["statDown"]!,
-        );
-      }),
-    );
-    onCleanup(
-      stablecoinMcap.on(({ previousValue, currentValue }) => {
-        stableDir.set(
-          currentValue >= previousValue ? css["statUp"]! : css["statDown"]!,
-        );
-      }),
-    );
-    onCleanup(
       derivativesVol.on(({ previousValue, currentValue }) => {
         derivDir.set(
           currentValue >= previousValue ? css["statUp"]! : css["statDown"]!,
@@ -391,11 +935,11 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
 
     // BTC chart derived paths
     const btcPaths = pulse<BtcPaths>(
-      buildBtcPaths(btcChartHistory.get(), btc.ath),
+      buildBtcPaths(btcChartHistory.get(), toNumber(btc.ath.get())),
     );
     onCleanup(
       btcChartHistory.on(({ currentValue }) => {
-        btcPaths.set(buildBtcPaths(currentValue, btc.ath));
+        btcPaths.set(buildBtcPaths(currentValue, toNumber(btc.ath.get())));
       }),
     );
     const btcLinePath = derived(btcPaths, (p) => p.line);
@@ -406,7 +950,7 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
     const btcMaxLabel = derived(btcPaths, (p) => p.maxLabel);
     const btcMinLabel = derived(btcPaths, (p) => p.minLabel);
     const btcCurrentLabel = derived(btcPaths, (p) => p.currentLabel);
-    const btcAthLabel = fmt(btc.ath);
+    const btcAthLabel = fmt(toNumber(btc.ath.get()));
     const btcGradientId = `btcGrad-${Math.random().toString(36).slice(2)}`;
 
     return (
@@ -414,6 +958,20 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
         <div class={css["topRow"]!}>
           <div class={css["statColumn"]!}>
             <div class={css["statGrid"]!}>
+              <Card padding="sm" radius="md" style="grid-column:1 / -1">
+                <div class={css["guideCard"]!}>
+                  <div class={css["guideCopy"]!}>
+                    <div class={css["statLabel"]!}>What You Can Do Here</div>
+                    <div class={css["guideTitle"]!}>
+                      Work with the crypto table like a live spreadsheet.
+                    </div>
+                    <p class={css["guideText"]!}>
+                      Edit values inline, paste from Excel or Google Sheets,
+                      copy selected ranges, and pause or speed up the live feed.
+                    </p>
+                  </div>
+                </div>
+              </Card>
               <Card padding="sm" radius="md">
                 <div class={css["statLabel"]!}>Global Market Cap</div>
                 <div
@@ -469,56 +1027,6 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
                     const div = el as HTMLDivElement;
                     onCleanup(
                       btcDir.on(({ currentValue }) => {
-                        div.className = `${css["statValue"]!}${currentValue ? ` ${currentValue}` : ""}`;
-                      }),
-                    );
-                  }}
-                />
-              </Card>
-              <Card padding="sm" radius="md">
-                <div class={css["statLabel"]!}>Active Cryptos</div>
-                <div class={css["statValue"]!}>50.24M</div>
-                <span class={css["statSub"]!}>Networks</span>
-              </Card>
-              <Card padding="sm" radius="md">
-                <div class={css["statLabel"]!}>ETH Dominance</div>
-                <div
-                  class={css["statValue"]!}
-                  text={ethDomDisplay}
-                  ref={(el) => {
-                    const div = el as HTMLDivElement;
-                    onCleanup(
-                      ethDir.on(({ currentValue }) => {
-                        div.className = `${css["statValue"]!}${currentValue ? ` ${currentValue}` : ""}`;
-                      }),
-                    );
-                  }}
-                />
-              </Card>
-              <Card padding="sm" radius="md">
-                <div class={css["statLabel"]!}>DeFi Cap</div>
-                <div
-                  class={css["statValue"]!}
-                  text={defiCapDisplay}
-                  ref={(el) => {
-                    const div = el as HTMLDivElement;
-                    onCleanup(
-                      defiDir.on(({ currentValue }) => {
-                        div.className = `${css["statValue"]!}${currentValue ? ` ${currentValue}` : ""}`;
-                      }),
-                    );
-                  }}
-                />
-              </Card>
-              <Card padding="sm" radius="md">
-                <div class={css["statLabel"]!}>Stablecoin MCap</div>
-                <div
-                  class={css["statValue"]!}
-                  text={stablecoinDisplay}
-                  ref={(el) => {
-                    const div = el as HTMLDivElement;
-                    onCleanup(
-                      stableDir.on(({ currentValue }) => {
                         div.className = `${css["statValue"]!}${currentValue ? ` ${currentValue}` : ""}`;
                       }),
                     );
@@ -805,171 +1313,53 @@ export const CryptoDashboard = component<CryptoDashboardProps>(
         </div>
         {/* topRow */}
 
-        <Card padding="none" radius="lg" style="overflow:hidden">
-          <div class={css["tableWrapper"]!}>
-            <table class={css["table"]!}>
-              <colgroup>
-                <col style="width:48px" />
-                <col style="width:200px" />
-                <col style="width:110px" />
-                <col style="width:80px" />
-                <col style="width:80px" />
-                <col style="width:80px" />
-                <col style="width:110px" />
-                <col style="width:110px" />
-                <col style="width:90px" />
-                <col style="width:130px" />
-                <col style="width:90px" />
-                <col style="width:110px" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th class={css["th"]!}>#</th>
-                  <th class={css["th"]!}>Name</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>Price</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>1h %</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>24h %</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>7d %</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>Market Cap</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>Volume (24h)</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>Vol/MCap</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>Circ. Supply</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>% from ATH</th>
-                  <th class={`${css["th"]!} ${css["right"]!}`}>Last 7 Days</th>
-                </tr>
-              </thead>
-            </table>
-            <div class={css["tableBodyWrapper"]!}>
-              <table class={css["table"]!}>
-                <colgroup>
-                  <col style="width:48px" />
-                  <col style="width:200px" />
-                  <col style="width:110px" />
-                  <col style="width:80px" />
-                  <col style="width:80px" />
-                  <col style="width:80px" />
-                  <col style="width:110px" />
-                  <col style="width:110px" />
-                  <col style="width:90px" />
-                  <col style="width:130px" />
-                  <col style="width:90px" />
-                  <col style="width:110px" />
-                </colgroup>
-                <tbody>
-                  {coins.map((coin) => {
-                    const priceDisplay = derived(coin.price, fmt);
-                    const change1hDisplay = derived(coin.change1h, fmtChange);
-                    const change24hDisplay = derived(coin.change24h, fmtChange);
-                    const change7dDisplay = derived(coin.change7d, fmtChange);
-                    const mcapDisplay = derived(coin.price, (p) =>
-                      fmtCompact(p * coin.supply),
-                    );
-                    const volumeDisplay = derived(coin.volume, fmtCompact);
-                    const volMcapDisplay = derived(coin.volume, (vol) => {
-                      const mcap = coin.price.get() * coin.supply;
-                      return `${((vol / mcap) * 100).toFixed(2)}%`;
-                    });
-                    const supplyDisplay = fmtSupply(
-                      coin.supply,
-                      coin.meta.symbol,
-                    );
-                    const pctATHDisplay = derived(coin.price, (p) =>
-                      fmtPctFromATH(p, coin.ath),
-                    );
-                    const strokeColor = pulse(
-                      coin.change7d.get() >= 0
-                        ? "var(--beat-ui-color-success)"
-                        : "var(--beat-ui-color-danger)",
-                    );
-                    onCleanup(
-                      coin.change7d.on(({ currentValue }) => {
-                        strokeColor.set(
-                          currentValue >= 0
-                            ? "var(--beat-ui-color-success)"
-                            : "var(--beat-ui-color-danger)",
-                        );
-                      }),
-                    );
-
-                    return (
-                      <tr class={css["tr"]!}>
-                        <td class={css["td"]!}>
-                          <span class={css["rank"]!}>{coin.meta.rank}</span>
-                        </td>
-                        <td class={css["td"]!}>
-                          <div class={css["coinName"]!}>
-                            <div class={css["coinInitial"]!}>
-                              {coin.meta.symbol[0]}
-                            </div>
-                            <div>
-                              <div class={css["coinTitle"]!}>
-                                {coin.meta.name}
-                              </div>
-                              <div class={css["coinSymbol"]!}>
-                                {coin.meta.symbol}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td
-                          class={`${css["td"]!} ${css["right"]!}`}
-                          ref={(el) => {
-                            const td = el as HTMLTableCellElement;
-                            onCleanup(
-                              coin.flashClass.on(({ currentValue }) => {
-                                td.className = `${css["td"]!} ${css["right"]!}${currentValue ? ` ${currentValue}` : ""}`;
-                              }),
-                            );
-                          }}
-                        >
-                          <span class={css["price"]!} text={priceDisplay} />
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <Badge tone={tone(coin.change1h.get())} size="sm">
-                            <span text={change1hDisplay} />
-                          </Badge>
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <Badge tone={tone(coin.change24h.get())} size="sm">
-                            <span text={change24hDisplay} />
-                          </Badge>
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <Badge tone={tone(coin.change7d.get())} size="sm">
-                            <span text={change7dDisplay} />
-                          </Badge>
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <span class={css["price"]!} text={mcapDisplay} />
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <span class={css["muted"]!} text={volumeDisplay} />
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <span class={css["muted"]!} text={volMcapDisplay} />
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <span class={css["muted"]!}>{supplyDisplay}</span>
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <Badge tone="danger" size="sm">
-                            <span text={pctATHDisplay} />
-                          </Badge>
-                        </td>
-                        <td class={`${css["td"]!} ${css["right"]!}`}>
-                          <Sparkline
-                            values={coin.history}
-                            width={100}
-                            height={32}
-                            stroke={strokeColor}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+        <Card
+          class={css["sheetCard"]!}
+          padding="none"
+          radius="lg"
+          style="display:flex;flex-direction:column;flex:1 1 0;min-height:0;overflow:hidden;background:var(--beat-ui-color-background-elevated)"
+        >
+          <div class={css["sheetArea"]!}>
+            <Sheet
+              ariaLabel="Cryptocurrency prices by market cap"
+              class={css["sheet"]!}
+              classNames={{
+                frame: css["sheetFrame"]!,
+                viewport: css["sheetViewport"]!,
+                root: css["sheetRoot"]!,
+                header: css["sheetHeader"]!,
+                row: css["sheetRow"]!,
+                headerRow: css["sheetHeaderRow"]!,
+                bodyRow: css["sheetBodyRow"]!,
+                headerCell: css["sheetHeaderCell"]!,
+                cell: css["sheetCell"]!,
+                stickyHeaderCell: css["sheetStickyHeaderCell"]!,
+              }}
+              columns={CRYPTO_TABLE_COLUMNS}
+              editValueBehavior="sync-until-dirty"
+              getHeaderCellProps={({ columnId }) => {
+                const resolvedColumnId = columnId as CryptoTableColumnId;
+                return isRightAlignedColumnId(resolvedColumnId)
+                  ? { class: css["right"]! }
+                  : undefined;
+              }}
+              getRowId={(row) => row.symbol.get()}
+              height="100%"
+              rowVirtualizationOverscan={64}
+              rowVirtualizationRootMargin="480px 0px 480px 0px"
+              rows={coins}
+              styles={{
+                frame:
+                  "--beat-ui-sheet-sticky-header-background:var(--beat-ui-color-background);border:none;border-radius:0;background:transparent",
+                viewport:
+                  "background:var(--beat-ui-color-background-elevated);overflow-x:hidden;overflow-y:auto",
+                root: "width:100%;min-width:100%;background:var(--beat-ui-color-background-elevated)",
+                row: "width:100%;min-width:100%",
+                headerCell: "min-width:0",
+                cell: "--beat-ui-sheet-cell-background:var(--beat-ui-color-background-elevated);--beat-ui-sheet-cell-selected-background:var(--beat-ui-color-background-accent-soft);min-width:0",
+              }}
+              virtualizeRows
+            />
           </div>
         </Card>
       </div>

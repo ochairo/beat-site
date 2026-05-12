@@ -8,15 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/manrope':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@ochairo/beat':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^1.6.6
+        version: 1.6.6
       '@ochairo/beat-ui':
-        specifier: ^1.6.5
-        version: 1.6.5
+        specifier: ^1.6.6
+        version: 1.6.6
+      '@ochairo/numbers':
+        specifier: ^1.6.6
+        version: 1.6.6
       '@ochairo/pulse':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^1.6.6
+        version: 1.6.6
       esbuild-wasm:
         specifier: ^0.28.0
         version: 0.28.0
@@ -375,6 +381,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fontsource-variable/manrope@5.2.8':
+    resolution: {integrity: sha512-nc9lOuCRz73UHnovDE2bwXUdghE2SEOc7Aii0qGe3CLyE03W1a7VnY5Z6euRiapiKbCkGS+eXbY3s/kvWeGeSw==}
+
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
 
@@ -384,24 +393,24 @@ packages:
   '@mermaid-js/parser@1.1.0':
     resolution: {integrity: sha512-gxK9ZX2+Fex5zu8LhRQoMeMPEHbc73UKZ0FQ54YrQtUxE1VVhMwzeNtKRPAu5aXks4FasbMe4xB4bWrmq6Jlxw==}
 
-  '@ochairo/beat-ui@1.6.5':
-    resolution: {integrity: sha512-ivgFytowwG2MCfV0q71ZL5ippwXMhxBHfUf2stussJK/GEfUh1cuei5pxJXjc65+Cxskl/e1Sa+fpz3uR5Xz3w==}
+  '@ochairo/beat-ui@1.6.6':
+    resolution: {integrity: sha512-MyWoB/rBZU05s55kHFU2Zq/ViHmX9DoZQM3GuHlRQu5I5O3Oo3SlggD4XwLI80r8cfa/xUjycNipkrZV4YrfdA==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/beat@1.6.0':
-    resolution: {integrity: sha512-S4F7+9wayXX+JFaQfThWF2Nun2n7LP9DcWOwtT8+PRQjl8TABbjh7+EPRPIABt+85ePaaziTx0acRyQPnSrxpA==}
+  '@ochairo/beat@1.6.6':
+    resolution: {integrity: sha512-La9fqYsqHj7M6reR9btHt9xJ3nqdR6CGFGjs5bRVSYuJpiijliOjcAQkY2dW0Ha8gevdIsuesDAYAByEZ9x2aA==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/numbers@1.5.0':
-    resolution: {integrity: sha512-5tRMGnO44EVNe23LlwNPShFkQnOC1/I/sRgl5p7OaIjkY/RMkzlbn61l1FXIR1an9iS6c79Sl9jWPY7Kn/1wAg==}
+  '@ochairo/numbers@1.6.6':
+    resolution: {integrity: sha512-FWvNcwbjvjz7F0btQpNTH9XRai0jesQ8zc/UdonYx0xvwljhI6fSB/2+DQ6c8R4LyOLxBVzGN6fyYALx1oX5zg==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/pulse@1.6.0':
-    resolution: {integrity: sha512-wP2wVWR5pmgCfMGnhx28OCWW+sxQ208w8Uk2uYsoKTWbXAySzHbJjzg4p+kmDjVIjCJwtGhGOF4BtUWCunE5WA==}
+  '@ochairo/pulse@1.6.6':
+    resolution: {integrity: sha512-snhjTEtlX7jvw9s019Ff9J1ARHqmKLIRCnproYQZEiNIkCSsBtICSozcZe8/zJRIFfBSwaNmk31rdtprQQrobA==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/scales@1.5.0':
-    resolution: {integrity: sha512-f5YrFscF40Cdnz/eHFSru3hn1opU0S4NtaXgL3HP8DzHfEOHQoWm4bGKjzwp7RV2ii+myw8fyw0JP22kPbmyvQ==}
+  '@ochairo/scales@1.6.6':
+    resolution: {integrity: sha512-Q00G99FXZPyr56597QMM+nlXyw3ncFWTKjPuqKuz+4agLEGtj1w8B3XXfDPBTbp2/P9nMGvO/WTX9PpDQ0TWRw==}
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     resolution: {integrity: sha512-x35CNW/ANXG3hE/EZpRU8MXX1JDN86hBb2wMGAtltkz7pc6cxgjpy1OMMfDosOQ+2hWqIkag/fGok1Yady9nGw==}
@@ -1217,6 +1226,8 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
+  '@fontsource-variable/manrope@5.2.8': {}
+
   '@iconify/types@2.0.0': {}
 
   '@iconify/utils@3.1.3':
@@ -1229,22 +1240,22 @@ snapshots:
     dependencies:
       langium: 4.2.3
 
-  '@ochairo/beat-ui@1.6.5':
+  '@ochairo/beat-ui@1.6.6':
     dependencies:
-      '@ochairo/beat': 1.6.0
-      '@ochairo/numbers': 1.5.0
-      '@ochairo/pulse': 1.6.0
-      '@ochairo/scales': 1.5.0
+      '@ochairo/beat': 1.6.6
+      '@ochairo/numbers': 1.6.6
+      '@ochairo/pulse': 1.6.6
+      '@ochairo/scales': 1.6.6
 
-  '@ochairo/beat@1.6.0':
+  '@ochairo/beat@1.6.6':
     dependencies:
-      '@ochairo/pulse': 1.6.0
+      '@ochairo/pulse': 1.6.6
 
-  '@ochairo/numbers@1.5.0': {}
+  '@ochairo/numbers@1.6.6': {}
 
-  '@ochairo/pulse@1.6.0': {}
+  '@ochairo/pulse@1.6.6': {}
 
-  '@ochairo/scales@1.5.0': {}
+  '@ochairo/scales@1.6.6': {}
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     optional: true
