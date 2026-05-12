@@ -316,9 +316,3 @@ vite.local.config.ts
 
 # Turborepo cache
 .turbo/
-
-# ============================================
-# OTHER PROJECT-SPECIFIC IGNORES
-# ============================================
-.github/*
-!.github/workflows/
