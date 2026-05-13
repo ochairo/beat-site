@@ -38,7 +38,7 @@ function increment() { count++; }
 
 // After
 const count = pulse(0);
-function increment() { count.set(count.get() + 1); }
+function increment() { count.set((n) => n + 1); }
 ```
 
 ## Replace global stores
@@ -80,7 +80,7 @@ count.on((event) => {
 });
 
 document.getElementById("btn")!.addEventListener("click", () => {
-  count.set(count.get() + 1);
+  count.set((n) => n + 1);
 });
 ```
 
@@ -95,7 +95,7 @@ import { render } from "@ochairo/beat";
 const count = pulse(0);
 
 render(document.getElementById("app")!, (
-  <button onClick={() => count.set(count.get() + 1)}>
+  <button onClick={() => count.set((n) => n + 1)}>
     count: {count}
   </button>
 ));

@@ -8,8 +8,10 @@ import { HttpPlaygroundRepository } from "../features/stackblitz/data/playground
 import { StackBlitzPage } from "../features/stackblitz/presentation/StackBlitzPage";
 import { HttpFeatureRepository } from "../features/home/data/feature-repository";
 import { HomePage } from "../features/home/presentation/Home";
-import { HttpTaskBoardRepository } from "../features/samples/data/task/repository";
-import { HttpCryptoDashboardRepository } from "../features/samples/data/crypto/repository";
+import { HttpCryptoDashboardRepository } from "../features/crypto-dashboard/data/crypto-dashboard-repository";
+import { CryptoDashboardPage } from "../features/crypto-dashboard/presentation/CryptoDashboardPage";
+import { HttpTaskBoardRepository } from "../features/task-management/data/task-board-repository";
+import { TaskManagementPage } from "../features/task-management/presentation/TaskManagementPage";
 import { SamplesPage } from "../features/samples/presentation/SamplesPage";
 import { httpClient } from "./http-client";
 
@@ -53,11 +55,57 @@ const routes: readonly BeatRouteDefinition[] = [
   },
   {
     path: "/samples",
-    view: () => (
+    view: () => null,
+    redirectTo: "/samples/crypto-dashboard",
+  },
+  {
+    path: "/samples/crypto-dashboard",
+    view: (match) => (
       <SamplesPage
-        taskBoardPort={taskBoardRepository}
-        cryptoDashboardPort={cryptoDashboardRepository}
-      />
+        activeSampleKey="crypto-dashboard"
+        navigateTo={(to) => match.navigate(to)}
+      >
+        <CryptoDashboardPage cryptoDashboardPort={cryptoDashboardRepository} />
+      </SamplesPage>
+    ),
+  },
+  {
+    path: "/samples/task-management",
+    view: () => null,
+    redirectTo: "/samples/task-management/task-boards",
+  },
+  {
+    path: "/samples/task-boards",
+    view: () => null,
+    redirectTo: "/samples/task-management/task-boards",
+  },
+  {
+    path: "/samples/gantt-chart",
+    view: () => null,
+    redirectTo: "/samples/task-management/gantt-chart",
+  },
+  {
+    path: "/samples/task-management/task-boards",
+    view: (match) => (
+      <SamplesPage
+        activeSampleKey="task-management"
+        activeTaskManagementKey="task-boards"
+        navigateTo={(to) => match.navigate(to)}
+      >
+        <TaskManagementPage taskBoardPort={taskBoardRepository} view="board" />
+      </SamplesPage>
+    ),
+  },
+  {
+    path: "/samples/task-management/gantt-chart",
+    view: (match) => (
+      <SamplesPage
+        activeSampleKey="task-management"
+        activeTaskManagementKey="gantt-chart"
+        navigateTo={(to) => match.navigate(to)}
+      >
+        <TaskManagementPage taskBoardPort={taskBoardRepository} view="gantt" />
+      </SamplesPage>
     ),
   },
 ];

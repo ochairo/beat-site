@@ -1,6 +1,6 @@
-import type { CoinMeta } from "../../domain/types";
-import type { CryptoDashboardPort } from "../../domain/ports";
-import type { HttpClient } from "../../../../shared/lib/http/http-client";
+import type { CoinMeta } from "../domain/types";
+import type { CryptoDashboardPort } from "../domain/ports";
+import type { HttpClient } from "../../../shared/lib/http/http-client";
 
 export class HttpCryptoDashboardRepository implements CryptoDashboardPort {
   constructor(private readonly http: HttpClient) {}

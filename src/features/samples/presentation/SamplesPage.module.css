@@ -6,16 +6,7 @@
   width: 100%;
   min-width: 0;
   min-height: 0;
-  gap: 1.5rem;
-}
-
-.page > .tab {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
+  gap: 1rem;
 }
 
 .header {
@@ -37,13 +28,21 @@
   margin: 0;
 }
 
+.tab {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
 .tab > :global([data-part="tab-list"]) {
-  position: relative;
   flex: 0 0 auto;
 }
 
 .tab > :global([data-part="panel"]) {
-  position: relative;
+  display: flex;
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
@@ -55,10 +54,62 @@
   display: none;
 }
 
-.tab > :global([data-part="panel"]) > :global([role="tabpanel"]:not([hidden])) {
+.tab > :global([data-part="panel"]) > :global([role="tabpanel"]) {
   display: flex;
   flex: 1 1 auto;
-  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.subtab {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.subtab > :global([data-part="tab-list"]) {
+  flex: 0 0 auto;
+}
+
+.subtab > :global([data-part="panel"]) {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.subtab > :global([data-part="panel"]) > :global([role="tabpanel"][hidden]) {
+  display: none;
+}
+
+.subtab > :global([data-part="panel"]) > :global([role="tabpanel"]) {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.content > * {
+  display: flex;
+  flex: 1 1 auto;
   width: 100%;
   min-width: 0;
   min-height: 0;

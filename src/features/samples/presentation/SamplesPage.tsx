@@ -1,67 +1,118 @@
-import { Show, component, onMount, type BeatJsxChild } from "@ochairo/beat";
-import { Tab } from "@ochairo/beat-ui";
-import { pulse } from "@ochairo/pulse";
+import { component, type BeatJsxChild } from "@ochairo/beat";
+import { Tab, type TabItem } from "@ochairo/beat-ui";
 
 import { SiteLayout } from "../../../shared/layout/Layout";
-import type { CryptoDashboardPort, TaskBoardPort } from "../domain/ports";
-import type { CoinMeta, TaskBoardData } from "../domain/types";
-import { CryptoDashboard } from "./components/crypto-dashboard/CryptoDashboard";
-import { TaskBoards } from "./components/task-boards/TaskBoards";
 import css from "./SamplesPage.module.css";
 
+type SampleRouteKey = "crypto-dashboard" | "task-management";
+type TaskManagementRouteKey = "task-boards" | "gantt-chart";
+
 export interface SamplesPageProps {
-  readonly taskBoardPort: TaskBoardPort;
-  readonly cryptoDashboardPort: CryptoDashboardPort;
+  readonly activeSampleKey: SampleRouteKey;
+  readonly activeTaskManagementKey?: TaskManagementRouteKey;
+  readonly navigateTo: (to: string) => void;
+  readonly children: BeatJsxChild;
 }
 
-const SAMPLE_TABS = [
-  { key: "crypto-dashboard" as const, label: "Crypto Dashboard" },
-  { key: "task-boards" as const, label: "Task Boards / Gantt Chart" },
+const SAMPLE_ROUTES = [
+  {
+    key: "crypto-dashboard" as const,
+    label: "Crypto Dashboard",
+    href: "/beat-site/samples/crypto-dashboard",
+  },
+  {
+    key: "task-management" as const,
+    label: "Task Management",
+    href: "/beat-site/samples/task-management/task-boards",
+  },
 ];
 
-const DEFAULT_SAMPLE_TAB = SAMPLE_TABS[0]?.key ?? "crypto-dashboard";
+const TASK_MANAGEMENT_ROUTES = [
+  {
+    key: "task-boards" as const,
+    label: "Task Boards",
+    href: "/beat-site/samples/task-management/task-boards",
+  },
+  {
+    key: "gantt-chart" as const,
+    label: "Gantt Chart",
+    href: "/beat-site/samples/task-management/gantt-chart",
+  },
+];
 
 export const SamplesPage = component<SamplesPageProps>(
   (props): BeatJsxChild => {
-    const taskBoardData = pulse<TaskBoardData | null>(null);
-    const coins = pulse<readonly CoinMeta[] | null>(null);
-    const activeSample = pulse<string>(DEFAULT_SAMPLE_TAB);
+    const renderCurrentContent = (): BeatJsxChild => (
+      <div class={css["content"]!}>{props.children}</div>
+    );
 
-    onMount(() => {
-      void Promise.all([
-        props.taskBoardPort.getTaskBoardData(),
-        props.cryptoDashboardPort.getCoins(),
-      ]).then(([task, crypto]) => {
-        taskBoardData.set(task);
-        coins.set(crypto);
-      });
-    });
+    const taskManagementItems: readonly TabItem[] = TASK_MANAGEMENT_ROUTES.map(
+      (sample) => ({
+        key: sample.key,
+        label: sample.label,
+        content:
+          sample.key === props.activeTaskManagementKey
+            ? renderCurrentContent()
+            : null,
+      }),
+    );
 
-    const items = SAMPLE_TABS.map((tab) => ({
-      key: tab.key,
-      label: tab.label,
-      renderContent: () =>
-        tab.key === "crypto-dashboard" ? (
-          <Show when={coins} mapValue={(v) => v !== null}>
-            {() => <CryptoDashboard coins={coins.get()!} />}
-          </Show>
+    const sampleItems: readonly TabItem[] = SAMPLE_ROUTES.map((sample) => ({
+      key: sample.key,
+      label: sample.label,
+      content:
+        sample.key !== props.activeSampleKey ? null : sample.key ===
+          "task-management" ? (
+          <Tab
+            ariaLabel="Task management demos"
+            class={css["subtab"]!}
+            items={taskManagementItems}
+            defaultValue={props.activeTaskManagementKey ?? "task-boards"}
+            onValueChange={(nextValue) => {
+              const nextRoute = TASK_MANAGEMENT_ROUTES.find(
+                (route) => route.key === nextValue,
+              );
+              if (nextRoute !== undefined) {
+                props.navigateTo(nextRoute.href);
+              }
+            }}
+            styles={{
+              container:
+                "display:flex;flex-direction:column;flex:1 1 auto;min-height:0;",
+              panel:
+                "display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden;",
+            }}
+          />
         ) : (
-          <Show when={taskBoardData} mapValue={(v) => v !== null}>
-            {() => <TaskBoards data={taskBoardData.get()!} />}
-          </Show>
+          renderCurrentContent()
         ),
     }));
 
     return (
       <SiteLayout contentStyle="display:flex;flex-direction:column;min-height:0;overflow:hidden">
-        <div class={css["page"]!}>
+        <section class={css["page"]!}>
           <Tab
+            ariaLabel="Sample demos"
             class={css["tab"]!}
-            items={items}
-            value={activeSample}
-            onValueChange={(nextValue) => activeSample.set(nextValue)}
+            items={sampleItems}
+            defaultValue={props.activeSampleKey}
+            unmountInactivePanels
+            onValueChange={(nextValue) => {
+              const nextRoute = SAMPLE_ROUTES.find(
+                (route) => route.key === nextValue,
+              );
+              if (nextRoute !== undefined) {
+                props.navigateTo(nextRoute.href);
+              }
+            }}
+            styles={{
+              container:
+                "display:flex;flex-direction:column;flex:1 1 auto;min-height:0;",
+              panel:
+                "display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden;",
+            }}
           />
-        </div>
+        </section>
       </SiteLayout>
     );
   },

@@ -50,7 +50,7 @@ const items = pulse(["tea", "coffee"]);
 const app = (
   <main>
     <h1>Beat</h1>
-    <button onClick={() => count.set(count.get() + 1)}>
+    <button onClick={() => count.set((n) => n + 1)}>
       count: {count}
     </button>
     <ul>

@@ -11,6 +11,8 @@ Have you ever added `useCallback`, `useMemo`, and a `key` prop to a single compo
 I have. That frustration eventually turned into a question: **does it have to be this way?**
 
 Beat is my answer to that question — here's the thinking behind it.
+If you want the shorter practical version first, read
+[Beat vs React + Vite](./beat-vs-react-vite).
 
 ## How frameworks handle updates
 
@@ -163,5 +165,4 @@ If that sounds like your kind of thing, welcome. Feel free to ask questions or s
 | Reactivity | Manual dependency arrays | Automatic via proxies | Automatic via signals | Automatic via signals | Explicit path subscriptions |
 | Subscription scope | Component-level | Property-level | Signal-level | Computation-level | Path-level |
 | Dependency management | Arrays and memoization | Automatic | Automatic | Automatic | Explicit `.on()` calls |
-| SSR | Yes | Yes | Yes | Yes | Yes |
 | State primitive | `useState` / `useReducer` | `ref` / `reactive` | `signal` / `computed` | `createSignal` / `createStore` | `pulse` / `derived` |

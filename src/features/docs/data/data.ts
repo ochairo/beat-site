@@ -1,6 +1,7 @@
 import type { DocHeading, DocPage, DocSection } from "../domain/types";
 
 import motivationMd from "./content/motivation/index.md?raw";
+import beatVsReactViteMd from "./content/motivation/beat-vs-react-vite.md?raw";
 import quickStartMd from "./content/beat/quick-start.md?raw";
 import integrationMd from "./content/beat/integration.md?raw";
 import apiMd from "./content/beat/api.md?raw";
@@ -53,6 +54,7 @@ function createPage(title: string, slug: string, content: string): DocPage {
 
 const docs: Record<string, string> = {
   motivation: motivationMd,
+  "beat-vs-react-vite": beatVsReactViteMd,
   "quick-start": quickStartMd,
   integration: integrationMd,
   api: apiMd,
@@ -69,8 +71,15 @@ const docs: Record<string, string> = {
 export function buildDocSections(): readonly DocSection[] {
   return [
     {
-      title: "Motivation",
-      pages: [createPage("Motivation", "motivation", docs["motivation"] ?? "")],
+      title: "Start Here",
+      pages: [
+        createPage("Motivation", "motivation", docs["motivation"] ?? ""),
+        createPage(
+          "Beat vs React + Vite",
+          "beat-vs-react-vite",
+          docs["beat-vs-react-vite"] ?? "",
+        ),
+      ],
     },
     {
       title: "Quick Start",
@@ -114,7 +123,7 @@ export function buildDocSections(): readonly DocSection[] {
       ],
     },
     {
-      title: "Architecture",
+      title: "Recommended Patterns",
       foldable: true,
       pages: [
         createPage(

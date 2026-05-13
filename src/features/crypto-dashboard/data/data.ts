@@ -1,4 +1,4 @@
-import type { CoinMeta } from "../../domain/types";
+import type { CoinMeta } from "../domain/types";
 
 export const COIN_META: readonly CoinMeta[] = [
   { rank: 1, name: "Bitcoin", symbol: "BTC", basePrice: 79690 },

@@ -3,6 +3,10 @@
 
 This guide describes a **suggested** architecture for Beat applications.
 
+If you are here to learn Beat itself, start with Quick Start, Integration, and
+API first. This page is an optional pattern for teams that want stronger
+boundaries in larger apps.
+
 It is not required. Beat does not enforce any particular folder structure or design pattern. You are free to organize your code however you see fit. This document offers one approach — feature-centric **Ports & Adapters** architecture, organized with Feature-Sliced Design — that tends to scale well and keep codebases maintainable as they grow.
 
 This architecture is inspired by the **Dependency Rule** from Robert C. Martin's Clean Architecture and Alistair Cockburn's Hexagonal Architecture (Ports & Adapters). Both share the same core principle:

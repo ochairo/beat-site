@@ -13,6 +13,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       "TextArea",
       "NumberInput",
       "DateInput",
+      "DateRangeInput",
       "TimeInput",
       "Select",
     ],
@@ -27,6 +28,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     items: [
       "Sheet",
       "DatePicker",
+      "DateRangePicker",
       "Sparkline",
       "BarChart",
       "AreaChart",
@@ -230,6 +232,33 @@ return (
     onValueChange={(v) => date.set(v)}
     placeholder="Select a date"
   />
+)`,
+  },
+  {
+    id: "daterangeinput",
+    name: "DateRangeInput",
+    tag: "molecule",
+    category: "Form",
+    height: "390px",
+    code: `const range = pulse({
+  start: "2026-05-12",
+  end: "2026-05-18",
+});
+
+return (
+  <div style="display:flex;flex-direction:column;gap:1rem;max-width:26rem;">
+    <DateRangeInput
+      id="demo-range-date"
+      name="demo-range-date"
+      value={range}
+      onValueChange={(value) => range.set(value)}
+      ariaLabel="Travel range"
+    />
+    <div style="display:grid;gap:0.35rem;font-size:0.82rem;color:var(--beat-ui-color-text-muted);">
+      <span>Start: {range.get().start || "—"}</span>
+      <span>End: {range.get().end || "—"}</span>
+    </div>
+  </div>
 )`,
   },
   {
@@ -504,6 +533,29 @@ return (
     value={selected}
     onValueChange={(v) => selected.set(v)}
   />
+)`,
+  },
+  {
+    id: "daterangepicker",
+    name: "DateRangePicker",
+    tag: "molecule",
+    category: "Data",
+    height: "380px",
+    code: `const selectedRange = pulse({
+  start: "2026-08-05",
+  end: "2026-08-11",
+});
+
+return (
+  <div style="display:grid;gap:1rem;justify-content:start;">
+    <DateRangePicker
+      value={selectedRange}
+      onValueChange={(value) => selectedRange.set(value)}
+    />
+    <p style="margin:0;font-size:0.82rem;color:var(--beat-ui-color-text-muted);">
+      {selectedRange.get().start || "—"} to {selectedRange.get().end || "—"}
+    </p>
+  </div>
 )`,
   },
   {

@@ -1,0 +1,340 @@
+/* ── Root ── */
+
+.root {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  gap: 1.25rem;
+  padding-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+/* ── Header ── */
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--beat-ui-color-border);
+  flex-wrap: wrap;
+}
+
+.headerCopy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.titleRowGantt {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  column-gap: 0.75rem;
+  row-gap: 0.75rem;
+}
+
+.titleSelect {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.titleMeta {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--beat-ui-color-text-muted);
+  white-space: nowrap;
+}
+
+.helperText {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--beat-ui-color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── Progress ── */
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.progressLabel {
+  font-size: 0.75rem;
+  color: var(--beat-ui-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.progressTrack {
+  width: 80px;
+  height: 3px;
+  background: var(--beat-ui-color-border);
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--beat-ui-color-success);
+  border-radius: 2px;
+  transition: width 0.35s ease;
+}
+
+@media (max-width: 1120px) {
+  .titleRowGantt {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+/* ── View Shell ── */
+
+.viewsTab {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.viewsTab > :global([data-part="tab-list"]) {
+  flex: 0 0 auto;
+}
+
+.viewsTab > :global([data-part="panel"]) {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.viewsTab > :global([data-part="panel"]) > :global([role="tabpanel"][hidden]) {
+  display: none;
+}
+
+.viewsTab
+  > :global([data-part="panel"])
+  > :global([role="tabpanel"]:not([hidden])) {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Dialog forms ── */
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--beat-ui-color-text-muted);
+}
+
+.fieldHelp {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--beat-ui-color-text-muted);
+  line-height: 1.45;
+}
+
+.colorSelectTrigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.625rem 2.5rem 0.625rem 0.875rem;
+  border: 1px solid var(--beat-ui-color-border);
+  border-radius: 0.875rem;
+  background: var(--beat-ui-color-input);
+  color: var(--beat-ui-color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.colorSelectTrigger:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--beat-ui-color-primary) 36%,
+    var(--beat-ui-color-border) 64%
+  );
+}
+
+.colorSelectTrigger:focus-visible {
+  outline: 2px solid var(--beat-ui-color-primary);
+  outline-offset: 2px;
+}
+
+.colorSelectValue {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.colorSelectChevron {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--beat-ui-color-text-muted);
+  pointer-events: none;
+  transition:
+    transform 0.16s ease,
+    color 0.16s ease;
+}
+
+.colorSelectTrigger[aria-expanded="true"] .colorSelectChevron {
+  transform: translateY(-50%) rotate(180deg);
+  color: var(--beat-ui-color-primary);
+}
+
+.colorSelectPopover {
+  max-width: calc(100vw - 2rem);
+  padding: 0.25rem;
+}
+
+.colorSelectMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.colorSelectOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--beat-ui-color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.colorSelectOption:hover {
+  background: var(--beat-ui-color-primary-soft, rgba(99, 102, 241, 0.15));
+  color: var(--beat-ui-color-primary);
+}
+
+.colorSelectOption[data-selected="true"] {
+  background: var(--beat-ui-color-primary-soft, rgba(99, 102, 241, 0.15));
+  color: var(--beat-ui-color-primary);
+}
+
+.colorSelectOption:focus-visible {
+  outline: 2px solid var(--beat-ui-color-primary);
+  outline-offset: 2px;
+}
+
+.colorSelectSwatch {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 0.22rem;
+  border: 1px solid
+    color-mix(in srgb, var(--beat-ui-color-text) 18%, transparent);
+  flex: 0 0 auto;
+}
+
+.colorSelectOptionLabel {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: 0.84rem;
+}
+
+.colorSelectOptionCheck {
+  flex: 0 0 auto;
+  min-width: 0.9rem;
+  color: var(--beat-ui-color-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: right;
+  opacity: 0;
+}
+
+.colorSelectOption[data-selected="true"] .colorSelectOptionCheck {
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .ganttHeaderRow,
+  .ganttBody {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .ganttHeaderRow,
+  .ganttBody {
+    grid-template-columns: 12.5rem minmax(0, 1fr);
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

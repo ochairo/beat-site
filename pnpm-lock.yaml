@@ -12,17 +12,17 @@ importers:
         specifier: ^5.2.8
         version: 5.2.8
       '@ochairo/beat':
-        specifier: ^1.6.6
-        version: 1.6.6
+        specifier: ^1.6.10
+        version: 1.6.10
       '@ochairo/beat-ui':
-        specifier: ^1.6.7
-        version: 1.6.7
+        specifier: ^1.6.10
+        version: 1.6.10
       '@ochairo/numbers':
         specifier: ^1.6.6
         version: 1.6.6
       '@ochairo/pulse':
-        specifier: ^1.6.6
-        version: 1.6.6
+        specifier: ^1.6.10
+        version: 1.6.10
       esbuild-wasm:
         specifier: ^0.28.0
         version: 0.28.0
@@ -393,24 +393,28 @@ packages:
   '@mermaid-js/parser@1.1.0':
     resolution: {integrity: sha512-gxK9ZX2+Fex5zu8LhRQoMeMPEHbc73UKZ0FQ54YrQtUxE1VVhMwzeNtKRPAu5aXks4FasbMe4xB4bWrmq6Jlxw==}
 
-  '@ochairo/beat-ui@1.6.7':
-    resolution: {integrity: sha512-70gTDtzxoeMX9MYHnA/uVetT9LUaG1iEiEBaMsw/jbOM3G/8roO3fyD1TDcjqE1IQ2uy9loHn/h5PI8jDl8rlA==}
+  '@ochairo/beat-ui@1.6.10':
+    resolution: {integrity: sha512-ACPEXspejevLMx7x3ew90rbbRNftQ2WqqRGRKpvQNAlWLLFLr0lUjm2kgdk83qtTPWy5aUDp7qbQYv0t9t2IRQ==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/beat@1.6.6':
-    resolution: {integrity: sha512-La9fqYsqHj7M6reR9btHt9xJ3nqdR6CGFGjs5bRVSYuJpiijliOjcAQkY2dW0Ha8gevdIsuesDAYAByEZ9x2aA==}
+  '@ochairo/beat@1.6.10':
+    resolution: {integrity: sha512-ZstbksqjWYsV5KntUSuQn41KMj+WcsMLg6IRdkgM149yqAHTzU0P+l5IjWkxBzCSXtBFAuFU11P1IiYi4wPahw==}
+    engines: {node: '>=20.0.0'}
+
+  '@ochairo/numbers@1.6.10':
+    resolution: {integrity: sha512-zTvKMlhFIScuawr3rUb+hcTsDL9Un4FOuhtQkq/nmwYUk39M0yqYS2jjrtZIjyXhU/R+3KF1G/e0wFVVC7S6LQ==}
     engines: {node: '>=20.0.0'}
 
   '@ochairo/numbers@1.6.6':
     resolution: {integrity: sha512-FWvNcwbjvjz7F0btQpNTH9XRai0jesQ8zc/UdonYx0xvwljhI6fSB/2+DQ6c8R4LyOLxBVzGN6fyYALx1oX5zg==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/pulse@1.6.6':
-    resolution: {integrity: sha512-snhjTEtlX7jvw9s019Ff9J1ARHqmKLIRCnproYQZEiNIkCSsBtICSozcZe8/zJRIFfBSwaNmk31rdtprQQrobA==}
+  '@ochairo/pulse@1.6.10':
+    resolution: {integrity: sha512-mwR0rNcYD5yRoKcyvD3bHi4gO3DRHN5W89kt7ZDtRGGL1pvm/+etwfnFStTVw+/v2xbKB/HEjvlB4Sxd8SeD+Q==}
     engines: {node: '>=20.0.0'}
 
-  '@ochairo/scales@1.6.6':
-    resolution: {integrity: sha512-Q00G99FXZPyr56597QMM+nlXyw3ncFWTKjPuqKuz+4agLEGtj1w8B3XXfDPBTbp2/P9nMGvO/WTX9PpDQ0TWRw==}
+  '@ochairo/scales@1.6.10':
+    resolution: {integrity: sha512-jV6SVFQ6sDKyYxiF7MBahVIQ6d4kNjek/cKzaubrFOsCGHRlhdWZKIERMeZTGS1gACgqG3ckrcajrJbuHRCuhQ==}
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     resolution: {integrity: sha512-x35CNW/ANXG3hE/EZpRU8MXX1JDN86hBb2wMGAtltkz7pc6cxgjpy1OMMfDosOQ+2hWqIkag/fGok1Yady9nGw==}
@@ -1240,22 +1244,24 @@ snapshots:
     dependencies:
       langium: 4.2.3
 
-  '@ochairo/beat-ui@1.6.7':
+  '@ochairo/beat-ui@1.6.10':
     dependencies:
-      '@ochairo/beat': 1.6.6
-      '@ochairo/numbers': 1.6.6
-      '@ochairo/pulse': 1.6.6
-      '@ochairo/scales': 1.6.6
+      '@ochairo/beat': 1.6.10
+      '@ochairo/numbers': 1.6.10
+      '@ochairo/pulse': 1.6.10
+      '@ochairo/scales': 1.6.10
 
-  '@ochairo/beat@1.6.6':
+  '@ochairo/beat@1.6.10':
     dependencies:
-      '@ochairo/pulse': 1.6.6
+      '@ochairo/pulse': 1.6.10
+
+  '@ochairo/numbers@1.6.10': {}
 
   '@ochairo/numbers@1.6.6': {}
 
-  '@ochairo/pulse@1.6.6': {}
+  '@ochairo/pulse@1.6.10': {}
 
-  '@ochairo/scales@1.6.6': {}
+  '@ochairo/scales@1.6.10': {}
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     optional: true

@@ -1,6 +1,10 @@
+<!-- markdownlint-disable MD013 -->
 # Plugin Architecture
 
 This guide describes a **suggested** architecture for domain-specific libraries.
+
+This page is about how you can structure your own library. It is not Beat's
+core framework story or a general Beat extension platform.
 
 It is not required. You are free to organize your library however you see fit. This document offers one approach — Plugin Architecture — that tends to keep domain-specific libraries extensible and maintainable as they grow.
 
@@ -50,6 +54,7 @@ The core ideas are:
 </svg>
 <!-- markdownlint-enable -->
 
+<!-- markdownlint-disable MD013 -->
 ## When to Use
 
 This architecture fits libraries that:

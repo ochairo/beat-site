@@ -53,10 +53,12 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
             <h1 class={css["title"]!}>
               <span class={css["highlight"]!}>Beat</span>
             </h1>
-            <h2 class={css["subtitle"]!}>Pulse-native JSX framework</h2>
+            <h2 class={css["subtitle"]!}>
+              Predictable frontend apps with exact local updates
+            </h2>
             <p class={css["description"]!}>
-              Direct-DOM rendering with fine-grained reactivity. Explicit
-              routing and async primitives. No virtual DOM.
+              Pulse keeps updates local while routing and resources stay
+              explicit.
             </p>
             <div class={css["buttons"]!}>
               <a
@@ -82,7 +84,7 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
           <div class={css["heroRight"]!}>
             <CodeBlock
               code={pulse(
-                `import { component } from '@ochairo/beat'\nimport { render } from '@ochairo/beat/render'\n\nconst App = component(() => (\n  <h1>Hello Beat!</h1>\n  <h2>Pulse-Native JSX framework</h2>\n  <p>Fast, reactive, no virtual DOM.</p>\n))\nrender(App, document.getElementById('root')!)`,
+                `import { component, render } from '@ochairo/beat'\nimport { pulse } from '@ochairo/pulse'\n\nconst count = pulse(0)\nconst App = component(() => (\n  <button onClick={() => count.set((n) => n + 1)}>\n    count: {count}\n  </button>\n))\nrender(document.getElementById('root')!, <App />)`,
               )}
               label="TSX"
               copyable={false}
