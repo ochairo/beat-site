@@ -19,6 +19,8 @@ function isDarkMode(): boolean {
 function initMermaid(): void {
   mermaid.initialize({
     startOnLoad: false,
+    layout: "dagre",
+    look: "classic",
     theme: isDarkMode() ? "dark" : "default",
     fontFamily: getSansFontFamily(),
   });

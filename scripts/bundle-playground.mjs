@@ -1,13 +1,18 @@
 import { build } from "esbuild";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { existsSync, copyFileSync } from "fs";
+import { existsSync, copyFileSync, mkdirSync } from "fs";
 import { createRequire } from "module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const out = resolve(root, "public/playground");
 const require = createRequire(import.meta.url);
+
+// The browser JS client checks the WASM compiler version during initialization.
+// Always copy it from the same locked package that supplies that client.
+mkdirSync(out, { recursive: true });
+copyFileSync(require.resolve("esbuild-wasm/esbuild.wasm"), resolve(out, "esbuild.wasm"));
 
 function siblingOrInstalled(pkg, srcRelPath, tsconfigRelPath) {
   const siblingDir = resolve(root, `../${pkg}`);
