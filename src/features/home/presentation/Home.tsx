@@ -52,6 +52,8 @@ export const HomePage = component<HomePageProps>((props): BeatJsxChild => {
           <div class={css["heroLeft"]!}>
             <h1 class={css["title"]!}>
               <span class={css["highlight"]!}>Beat</span>
+              {" "}
+              <span class={css["version"]!}>v{__BEAT_VERSION__}</span>
             </h1>
             <h2 class={css["subtitle"]!}>
               Predictable frontend apps with exact local updates
