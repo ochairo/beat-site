@@ -12,17 +12,17 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@ochairo/beat':
-        specifier: ^1.6.10
-        version: 1.6.10
+        specifier: ^2.0.0
+        version: 2.0.0(vite@7.3.7)
       '@ochairo/beat-ui':
-        specifier: ^1.6.10
-        version: 1.6.10
+        specifier: ^2.0.0
+        version: 2.0.0(vite@7.3.7)
       '@ochairo/numbers':
-        specifier: ^1.6.10
-        version: 1.6.10
+        specifier: ^2.0.0
+        version: 2.0.0
       '@ochairo/pulse':
-        specifier: ^1.6.10
-        version: 1.6.10
+        specifier: ^2.0.0
+        version: 2.0.0
       esbuild-wasm:
         specifier: ^0.28.2
         version: 0.28.2
@@ -401,24 +401,30 @@ packages:
     os: [linux]
     libc: [glibc]
 
-  '@ochairo/beat-ui@1.6.10':
-    resolution: {integrity: sha512-ACPEXspejevLMx7x3ew90rbbRNftQ2WqqRGRKpvQNAlWLLFLr0lUjm2kgdk83qtTPWy5aUDp7qbQYv0t9t2IRQ==}
-    engines: {node: '>=20.0.0'}
+  '@ochairo/beat-ui@2.0.0':
+    resolution: {integrity: sha512-FX0Z3YHZe8vmG6Os4skuCm+VYttVBT4l1Nq91EvSMDjXt830liw1qlfit3XRVxTCV0CVd3oBVsFM0yyt8509vw==}
+    engines: {node: ^24.22.1 || >=26.12.1}
 
-  '@ochairo/beat@1.6.10':
-    resolution: {integrity: sha512-ZstbksqjWYsV5KntUSuQn41KMj+WcsMLg6IRdkgM149yqAHTzU0P+l5IjWkxBzCSXtBFAuFU11P1IiYi4wPahw==}
-    engines: {node: '>=20.0.0'}
+  '@ochairo/beat@2.0.0':
+    resolution: {integrity: sha512-hW29yZ70/2q9ltGe8fJTNAOiW/ShZVBQsMkoIFwxwo+V3sl6F/xfXRDaGWHXJWfelnNDxBzazcC+Q1ZQTD9+kw==}
+    engines: {node: ^24.22.1 || >=26.12.1}
+    peerDependencies:
+      vite: ^7.3.7 || ^8.3.5
+    peerDependenciesMeta:
+      vite:
+        optional: true
 
-  '@ochairo/numbers@1.6.10':
-    resolution: {integrity: sha512-zTvKMlhFIScuawr3rUb+hcTsDL9Un4FOuhtQkq/nmwYUk39M0yqYS2jjrtZIjyXhU/R+3KF1G/e0wFVVC7S6LQ==}
-    engines: {node: '>=20.0.0'}
+  '@ochairo/numbers@2.0.0':
+    resolution: {integrity: sha512-HDybkIL/DuwB4ein0XhKijb3G9oF80aBXGYMcyVb3Wgs8s4flSHirxIq070ygbYj586nqIJjN2XfFXeDrDl8JA==}
+    engines: {node: ^24.22.1 || >=26.12.1}
 
-  '@ochairo/pulse@1.6.10':
-    resolution: {integrity: sha512-mwR0rNcYD5yRoKcyvD3bHi4gO3DRHN5W89kt7ZDtRGGL1pvm/+etwfnFStTVw+/v2xbKB/HEjvlB4Sxd8SeD+Q==}
-    engines: {node: '>=20.0.0'}
+  '@ochairo/pulse@2.0.0':
+    resolution: {integrity: sha512-//DPSJqrq7/x6DD7ug2mfssMpccFiQtW4VEPWGO90jRvrjFKvbDdfdeB2nwanofqEKOh4k5E7LGmarkNu5/oSg==}
+    engines: {node: ^24.22.1 || >=26.12.1}
 
-  '@ochairo/scales@1.6.10':
-    resolution: {integrity: sha512-jV6SVFQ6sDKyYxiF7MBahVIQ6d4kNjek/cKzaubrFOsCGHRlhdWZKIERMeZTGS1gACgqG3ckrcajrJbuHRCuhQ==}
+  '@ochairo/scales@2.0.0':
+    resolution: {integrity: sha512-/8MTGoXWrJztCi7Tf3OcT5wd1czIjeW7/1kNZouDhte47XoTer+wGI4wMDeZvRnQsjaFBUKDKdctiBqOJNwqcA==}
+    engines: {node: ^24.22.1 || >=26.12.1}
 
   '@rollup/rollup-android-arm-eabi@4.65.0':
     resolution: {integrity: sha512-t2AnVba25baFdq7gczzS13JyVcdubLVbFX1X04mxrggDrTQPUXNv3XM0k9H1hr5tqvg7AVvtQ720QHAj0iYqhg==}
@@ -1242,22 +1248,27 @@ snapshots:
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
 
-  '@ochairo/beat-ui@1.6.10':
+  '@ochairo/beat-ui@2.0.0(vite@7.3.7)':
     dependencies:
-      '@ochairo/beat': 1.6.10
-      '@ochairo/numbers': 1.6.10
-      '@ochairo/pulse': 1.6.10
-      '@ochairo/scales': 1.6.10
+      '@ochairo/beat': 2.0.0(vite@7.3.7)
+      '@ochairo/numbers': 2.0.0
+      '@ochairo/pulse': 2.0.0
+      '@ochairo/scales': 2.0.0
+    transitivePeerDependencies:
+      - vite
 
-  '@ochairo/beat@1.6.10':
+  '@ochairo/beat@2.0.0(vite@7.3.7)':
     dependencies:
-      '@ochairo/pulse': 1.6.10
+      '@ochairo/pulse': 2.0.0
+      typescript: 5.9.3
+    optionalDependencies:
+      vite: 7.3.7
 
-  '@ochairo/numbers@1.6.10': {}
+  '@ochairo/numbers@2.0.0': {}
 
-  '@ochairo/pulse@1.6.10': {}
+  '@ochairo/pulse@2.0.0': {}
 
-  '@ochairo/scales@1.6.10': {}
+  '@ochairo/scales@2.0.0': {}
 
   '@rollup/rollup-android-arm-eabi@4.65.0':
     optional: true

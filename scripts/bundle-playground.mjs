@@ -1,39 +1,19 @@
 import { build } from "esbuild";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
-import { existsSync, copyFileSync, mkdirSync } from "fs";
-import { createRequire } from "module";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { existsSync, copyFileSync, mkdirSync } from "node:fs";
+import { createRequire } from "node:module";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = resolve(__dirname, "..");
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = resolve(root, "public/playground");
 const require = createRequire(import.meta.url);
+const beatEntry = require.resolve("@ochairo/beat");
 
-// The browser JS client checks the WASM compiler version during initialization.
-// Always copy it from the same locked package that supplies that client.
-mkdirSync(out, { recursive: true });
-copyFileSync(require.resolve("esbuild-wasm/esbuild.wasm"), resolve(out, "esbuild.wasm"));
-
-function siblingOrInstalled(pkg, srcRelPath, tsconfigRelPath) {
-  const siblingDir = resolve(root, `../${pkg}`);
-  if (existsSync(siblingDir)) {
-    return {
-      entryPoint: resolve(siblingDir, srcRelPath),
-      tsconfig: resolve(siblingDir, tsconfigRelPath),
-    };
-  }
-  // Fall back to installed package dist
-  const pkgMain = require.resolve(`@ochairo/${pkg}`);
-  // For sub-paths like jsx-runtime, render, dom — derive from package exports
-  const pkgDir = resolve(pkgMain, "../../");
-  const distFile = resolve(
-    pkgDir,
-    srcRelPath.replace(/^src\//, "dist/").replace(/\.ts$/, ".js"),
-  );
-  return {
-    entryPoint: existsSync(distFile) ? distFile : pkgMain,
-    tsconfig: undefined,
-  };
+// Keep the existing playground-only DOM alias. Beat has no public DOM subpath,
+// so this one legacy entry depends on a fixed member of the locked artifact.
+const legacyDomEntry = resolve(dirname(beatEntry), "dom.js");
+if (!existsSync(legacyDomEntry)) {
+  throw new Error("The installed @ochairo/beat package is missing the legacy playground DOM entry.");
 }
 
 const beatExternals = [
@@ -45,75 +25,54 @@ const beatExternals = [
 
 const bundles = [
   {
-    ...siblingOrInstalled("pulse", "src/index.ts", "tsconfig.json"),
+    entryPoints: [require.resolve("@ochairo/pulse")],
     outfile: `${out}/pulse.js`,
     external: [],
   },
   {
-    ...siblingOrInstalled("beat", "src/index.ts", "tsconfig.json"),
+    entryPoints: [beatEntry],
     outfile: `${out}/beat.js`,
     external: ["@ochairo/pulse"],
   },
   {
-    ...siblingOrInstalled("beat", "src/jsx-runtime.ts", "tsconfig.json"),
+    entryPoints: [require.resolve("@ochairo/beat/jsx-runtime")],
     outfile: `${out}/beat-jsx-runtime.js`,
     external: ["@ochairo/beat", "@ochairo/pulse"],
   },
   {
-    ...siblingOrInstalled("beat", "src/render.ts", "tsconfig.json"),
+    // Preserve the existing playground alias using Beat's public exports.
+    stdin: {
+      contents: 'export { createRoot, hydrate, render } from "@ochairo/beat";',
+      sourcefile: "playground-render.js",
+      resolveDir: root,
+    },
     outfile: `${out}/beat-render.js`,
-    external: ["@ochairo/beat", "@ochairo/pulse"],
+    external: ["@ochairo/beat"],
   },
   {
-    ...siblingOrInstalled("beat", "src/dom.ts", "tsconfig.json"),
+    entryPoints: [legacyDomEntry],
     outfile: `${out}/beat-dom.js`,
     external: ["@ochairo/beat", "@ochairo/pulse"],
   },
   {
-    // Always use the pre-built dist so CSS Module class names are already resolved
-    entryPoint: (() => {
-      const siblingDist = resolve(root, "../beat-ui/dist/index.js");
-      if (existsSync(siblingDist)) return siblingDist;
-      return require.resolve("@ochairo/beat-ui");
-    })(),
+    entryPoints: [require.resolve("@ochairo/beat-ui")],
     outfile: `${out}/beat-ui.js`,
     external: beatExternals,
   },
 ];
 
-for (const {
-  entryPoint,
-  outfile,
-  external,
-  tsconfig,
-  jsxImportSource,
-} of bundles) {
+mkdirSync(out, { recursive: true });
+for (const bundle of bundles) {
   await build({
-    entryPoints: [entryPoint],
+    ...bundle,
     bundle: true,
     format: "esm",
-    outfile,
-    external,
     minify: true,
-    jsx: "automatic",
-    ...(jsxImportSource ? { jsxImportSource } : {}),
-    ...(tsconfig ? { tsconfig } : {}),
   });
-  console.log(`built ${outfile.replace(root + "/", "")}`);
+  console.log(`built ${bundle.outfile.replace(root + "/", "")}`);
 }
 
-// Copy beat-ui CSS
-const beatUiSiblingDir = resolve(root, "../beat-ui");
-let beatUiCssSrc;
-if (existsSync(beatUiSiblingDir)) {
-  beatUiCssSrc = resolve(beatUiSiblingDir, "dist/index.css");
-} else {
-  const pkgMain = require.resolve("@ochairo/beat-ui");
-  beatUiCssSrc = resolve(pkgMain, "../../dist/index.css");
-}
-if (existsSync(beatUiCssSrc)) {
-  copyFileSync(beatUiCssSrc, resolve(out, "beat-ui.css"));
-  console.log("built public/playground/beat-ui.css");
-} else {
-  console.warn("beat-ui CSS not found at", beatUiCssSrc);
-}
+// Both assets come from the same locked packages used by the site's JS clients.
+copyFileSync(require.resolve("@ochairo/beat-ui/style.css"), resolve(out, "beat-ui.css"));
+copyFileSync(require.resolve("esbuild-wasm/esbuild.wasm"), resolve(out, "esbuild.wasm"));
+console.log("copied playground CSS and WASM from installed packages");
